@@ -1,0 +1,4 @@
+export LD_LIBRARY_PATH=/home/mdl/hzj5142/soft/install2/lib:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=/home/mdl/hzj5142/soft/install2/lib64:${LD_LIBRARY_PATH}
+export PATH=/home/mdl/hzj5142/soft/install2/bin:${PATH}
+

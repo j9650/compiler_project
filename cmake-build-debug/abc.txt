@@ -1,0 +1,136 @@
+Hello World!
+graph5001.txt
+tot: 20000
+Detached Thread:   ===AggressiveGS===   Running
+Detached Thread:  GuardRelaxing_edge0::Guard mainThread__   Running
+GuardRelaxing_edge0::Guard Start
+send check to  GuardRelaxing_edge0::Guard 0 1 2
+Detached Thread:  GuardRelaxing_edge0::Guard mainThread__   Running
+GuardRelaxing_edge0::Guard Start
+GuardRelaxing_edge0::Guard 	 Handling Check
+send check to  GuardRelaxing_edge0::Guard 1 2 1
+GuardRelaxing_edge0::Guard 	 Handling Check
+GuardRelaxing_edge0::Guard 	 Handling Start
+GuardRelaxing_edge0::Guard 	 Handling Start
+Guard-0 Detached Thread:  GuardRelaxing_edge0::Guard's task   Running
+Guard-0 Detached Thread:  GuardRelaxing_edge0::Guard's task   Running
+Bellman_fordFluid::Relaxing_edge: 0
+Guard-0 GuardRelaxing_edge0::Guard 	 Handling Completed
+Guard-0 COMPLETE>>>>>>>>>> GuardRelaxing_edge0::Guard Wall:  1.53973e+12 CPU: -2.32138e+15
+Guard-0 GUARDFINSHED@@@@@@@@ GuardRelaxing_edge0::Guard Wall:  0.779451 CPU: 0
+Guard-0 Scheduler::: XXXXXX GuardRelaxing_edge0::Guard 0 0 1 0
+Guard-0 GuardRelaxing_edge0::Guard 	 Handling Completed
+Guard-0 GuardRelaxing_edge0::Guard nextGuardToStart 0 11 1
+Guard-0 Detached Thread:  GuardRelaxing_edge1::Guard mainThread__   Running
+Guard-0 COMPLETE>>>>>>>>>> GuardRelaxing_edge0::Guard Wall:  1.53973e+12 CPU: -2.32054e+15
+Guard-0 GuardRelaxing_edge1::Guard Start
+Guard-0 GUARDFINSHED@@@@@@@@ GuardRelaxing_edge0::Guard Wall:  0.473832 CPU: 0
+Guard-0 GuardRelaxing_edge1::Guard 	 Handling Check
+Guard-0 Scheduler::: send check to  GuardRelaxing_edge1::Guard 2 11 1
+Guard-0 GuardRelaxing_edge1::Guard 	 Handling Start
+Guard-0 Scheduler::: XXXXXX GuardRelaxing_edge0::Guard 1 0 2 0
+Guard-0 GuardRelaxing_edge0::Guard nextGuardToStart 1 11 1
+Guard-2 Detached Thread:  GuardRelaxing_edge2::Guard mainThread__   Running
+Guard-2 Detached Thread:  GuardRelaxing_edge1::Guard's task   Running
+Guard-2 GuardRelaxing_edge2::Guard Start
+Guard-2 Scheduler::: send check to  GuardRelaxing_edge2::Guard 3 11 1
+Guard-2 GuardRelaxing_edge2::Guard 	 Handling Check
+Bellman_fordFluid::Relaxing_edge: 1
+Guard-2 GuardRelaxing_edge2::Guard 	 Handling Start
+Guard-3 Detached Thread:  GuardRelaxing_edge2::Guard's task   Running
+Guard-3 GuardRelaxing_edge1::Guard 	 Handling Completed
+Guard-3 COMPLETE>>>>>>>>>> GuardRelaxing_edge1::Guard Wall:  1.53973e+12 CPU: -3.61195e+15
+Guard-3 GUARDFINSHED@@@@@@@@ GuardRelaxing_edge1::Guard Wall:  0.250817 CPU: 0
+Guard-3 Scheduler::: XXXXXX GuardRelaxing_edge1::Guard 2 0 3 0
+Bellman_fordFluid::Relaxing_edge: 2
+Guard-3 GuardRelaxing_edge1::Guard nextGuardToStart 2 11 1
+Guard-3 Detached Thread:  GuardRelaxing_edge3::Guard mainThread__   Running
+Guard-3 GuardRelaxing_edge3::Guard Start
+Guard-3 Scheduler::: send check to  GuardRelaxing_edge3::Guard 4 11 1
+Guard-3 GuardRelaxing_edge3::Guard 	 Handling Check
+Guard-3 GuardRelaxing_edge3::Guard 	 Handling Start
+Guard-4 Detached Thread:  GuardRelaxing_edge3::Guard's task   Running
+Guard-4 GuardRelaxing_edge2::Guard 	 Handling Completed
+Guard-4 COMPLETE>>>>>>>>>> GuardRelaxing_edge2::Guard Wall:  1.53973e+12 CPU: 0
+Bellman_fordFluid::Relaxing_edge: 3
+Guard-4 GUARDFINSHED@@@@@@@@ GuardRelaxing_edge2::Guard Wall:  0.33708 CPU: 0
+Guard-4 Scheduler::: XXXXXX GuardRelaxing_edge2::Guard 3 0 4 0
+Guard-4 GuardRelaxing_edge2::Guard nextGuardToStart 3 11 1
+Guard-4 Detached Thread:  GuardRelaxing_edge4::Guard mainThread__   Running
+Guard-4 GuardRelaxing_edge3::Guard 	 Handling Completed
+Guard-4 GuardRelaxing_edge4::Guard Start
+Guard-4 COMPLETE>>>>>>>>>> GuardRelaxing_edge3::Guard Wall:  1.53973e+12 CPU: 0
+Guard-4 Scheduler::: send check to  GuardRelaxing_edge4::Guard 5 11 1
+Guard-4 GuardRelaxing_edge4::Guard 	 Handling Check
+Guard-4 GUARDFINSHED@@@@@@@@ GuardRelaxing_edge3::Guard Wall:  0.196752 CPU: 0
+Guard-4 GuardRelaxing_edge4::Guard 	 Handling Start
+Guard-4 Scheduler::: XXXXXX GuardRelaxing_edge3::Guard 4 0 5 0
+Guard-5 GuardRelaxing_edge3::Guard nextGuardToStart 4 11 1
+Guard-5 Detached Thread:  GuardRelaxing_edge4::Guard's task   Running
+Guard-5 Detached Thread:  GuardRelaxing_edge5::Guard mainThread__   Running
+Bellman_fordFluid::Relaxing_edge: 4
+Guard-5 GuardRelaxing_edge5::Guard Start
+Guard-5 Scheduler::: send check to  GuardRelaxing_edge5::Guard 6 11 1
+Guard-5 GuardRelaxing_edge5::Guard 	 Handling Check
+Guard-5 GuardRelaxing_edge5::Guard 	 Handling Start
+Guard-6 Detached Thread:  GuardRelaxing_edge5::Guard's task   Running
+Guard-6 GuardRelaxing_edge4::Guard 	 Handling Completed
+Bellman_fordFluid::Relaxing_edge: 5
+Guard-6 COMPLETE>>>>>>>>>> GuardRelaxing_edge4::Guard Wall:  1.53973e+12 CPU: 0
+Guard-6 GUARDFINSHED@@@@@@@@ GuardRelaxing_edge4::Guard Wall:  0.270933 CPU: 0
+Guard-6 Scheduler::: XXXXXX GuardRelaxing_edge4::Guard 5 0 6 0
+Guard-6 GuardRelaxing_edge4::Guard nextGuardToStart 5 11 1
+Guard-6 Detached Thread:  GuardRelaxing_edge6::Guard mainThread__   Running
+Guard-6 GuardRelaxing_edge5::Guard 	 Handling Completed
+Guard-6 GuardRelaxing_edge6::Guard Start
+Guard-6 COMPLETE>>>>>>>>>> GuardRelaxing_edge5::Guard Wall:  1.53973e+12 CPU: 0
+Guard-6 Scheduler::: send check to  GuardRelaxing_edge6::Guard 7 11 1
+Guard-6 GuardRelaxing_edge6::Guard 	 Handling Check
+Guard-6 GUARDFINSHED@@@@@@@@ GuardRelaxing_edge5::Guard Wall:  0.218443 CPU: 0
+Guard-6 GuardRelaxing_edge6::Guard 	 Handling Start
+Guard-6 Scheduler::: XXXXXX GuardRelaxing_edge5::Guard 6 0 7 0
+Guard-7 Detached Thread:  GuardRelaxing_edge6::Guard's task   Running
+Guard-7 GuardRelaxing_edge5::Guard nextGuardToStart 6 11 1
+Guard-7 Detached Thread:  GuardRelaxing_edge7::Guard mainThread__   Running
+Bellman_fordFluid::Relaxing_edge: 6
+Guard-7 GuardRelaxing_edge7::Guard Start
+Guard-7 Scheduler::: send check to  GuardRelaxing_edge7::Guard 8 11 1
+Guard-7 GuardRelaxing_edge7::Guard 	 Handling Check
+Guard-7 GuardRelaxing_edge7::Guard 	 Handling Start
+Guard-7 GuardRelaxing_edge6::Guard 	 Handling Completed
+Guard-8 Detached Thread:  GuardRelaxing_edge7::Guard's task   Running
+Guard-8 COMPLETE>>>>>>>>>> GuardRelaxing_edge6::Guard Wall:  1.53973e+12 CPU: 0
+Guard-8 Scheduler::: XXXXXX GuardRelaxing_edge6::Guard 7 0 8 0Bellman_fordFluid::Relaxing_edge: 
+7
+Guard-8 GUARDFINSHED@@@@@@@@ GuardRelaxing_edge6::Guard Wall:  0.182676 CPU: 0
+Guard-8 GuardRelaxing_edge6::Guard nextGuardToStart 7 11 1
+Guard-8 Detached Thread:  GuardRelaxing_edge8::Guard mainThread__   Running
+Guard-8 GuardRelaxing_edge8::Guard Start
+Guard-8 Scheduler::: send check to  GuardRelaxing_edge8::Guard 9 11 1
+Guard-8 GuardRelaxing_edge8::Guard 	 Handling Check
+Guard-8 GuardRelaxing_edge7::Guard 	 Handling Completed
+Guard-8 GuardRelaxing_edge8::Guard 	 Handling Start
+Guard-9 COMPLETE>>>>>>>>>> GuardRelaxing_edge7::Guard Wall:  1.53973e+12 CPU: 0
+Guard-9 Detached Thread:  GuardRelaxing_edge8::Guard's task   Running
+Guard-9 Scheduler::: XXXXXX GuardRelaxing_edge7::Guard 8 0 9 0
+Guard-9 GuardRelaxing_edge7::Guard nextGuardToStart 8 11 1
+Bellman_fordFluid::Relaxing_edge: 8
+Guard-9 GUARDFINSHED@@@@@@@@ GuardRelaxing_edge7::Guard Wall:  0.211474 CPU: 0
+Guard-9 Detached Thread:  GuardRelaxing_edge9::Guard mainThread__   Running
+Guard-9 GuardRelaxing_edge9::Guard Start
+Guard-9 Scheduler::: send check to  GuardRelaxing_edge9::Guard 10 11 1
+Guard-9 GuardRelaxing_edge9::Guard 	 Handling Check
+Guard-9 GuardRelaxing_edge9::Guard 	 Handling Start
+Guard-10 Detached Thread:  GuardRelaxing_edge9::Guard's task   Running
+Guard-10 GuardRelaxing_edge8::Guard 	 Handling Completed
+Bellman_fordFluid::Relaxing_edge: 9
+Guard-10 COMPLETE>>>>>>>>>> GuardRelaxing_edge8::Guard Wall:  1.53973e+12 CPU: 0
+Guard-10 Scheduler::: XXXXXX GuardRelaxing_edge8::Guard 9 0 10 0
+Guard-10 GuardRelaxing_edge8::Guard nextGuardToStart 9 11 1
+Guard-10 GUARDFINSHED@@@@@@@@ GuardRelaxing_edge8::Guard Wall:  0.238021 CPU: 0
+Bellman Ford!
+Guard-10 GuardRelaxing_edge9::Guard 	 Handling Completed
+Guard-10 Fluid CPUTimer:  0  WallTimer:  4.28069
+Guard-10 COMPLETE>>>>>>>>>> GuardRelaxing_edge9::Guard Wall:  1.53973e+12 CPU: 0
+Guard-10 GuardRelaxing_edge9::Guard nextGuardToStart 10 11 3
+Guard-10 GUARDFINSHED@@@@@@@@ GuardRelaxing_edge9::Guard Wall:  0.162918 CPU: 0

@@ -1,0 +1,11 @@
+#export LD_LIBRARY_PATH=/home/mdl/hzj5142/soft/install4/gcc-4.8.5/lib:${LD_LIBRARY_PATH}
+#export LD_LIBRARY_PATH=/home/mdl/hzj5142/soft/install4/gcc-4.8.5/lib64:${LD_LIBRARY_PATH}
+#export PATH=/home/mdl/hzj5142/soft/install4/gcc-4.8.5/bin:${PATH}
+
+export LD_LIBRARY_PATH=/home/mdl/huz123/software/install/lib:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=/home/mdl/huz123/software/install/lib64:${LD_LIBRARY_PATH}
+export PATH=/home/mdl/huz123/software/install/bin:${PATH}
+
+export LD_LIBRARY_PATH=/home/mdl/hzj5142/soft/install4/gcc-7.0.1/lib:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=/home/mdl/hzj5142/soft/install4/gcc-7.0.1/lib64:${LD_LIBRARY_PATH}
+export PATH=/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin:${PATH}
