@@ -1,0 +1,136 @@
+%\section{Evaluation Methodology}
+\begin{figure*}[t]
+\vspace{-0cm}
+\centering
+    \begin{minipage}{.3\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{figs/BF-.pdf}
+    \caption{Results for Bellman-Ford with four different input graphs.}
+    \label{figs:bf}
+    \end{minipage}\hspace{0.cm}
+    \begin{minipage}{0.6\textwidth}
+	\centering
+    \begin{subfigure}{0.475\textwidth}
+    	\centering
+        \includegraphics[width=1\textwidth]{./figs/GC-5000-2000000.pdf}
+        \vspace{-20pt}\caption{Result for 5K\_2M.}
+	\label{fig:gc_a}
+    \end{subfigure}
+	\quad
+    \begin{subfigure}{0.475\textwidth}
+    	\centering
+        \includegraphics[width=1\textwidth]{./figs/GC-5000-200000.pdf}
+        \vspace{-20pt}\caption{Result for 5K\_200K.}
+	\label{fig:gc_b}
+    \end{subfigure}
+	\vspace{-12pt}\caption{Graph coloring results.}
+	\label{fig:gc}
+    \end{minipage}
+    \vspace{-4pt}
+\end{figure*}
+\begin{figure*}[t]
+%\vspace{-0.4cm}
+	\centering
+    \begin{subfigure}{0.3\textwidth}
+    	\centering
+        \includegraphics[width=0.95\textwidth]{./figs/SB-Hela.pdf}
+        \vspace{-8pt}\caption{Result for HeLa.}
+	\label{fig:sb_a}
+    \end{subfigure}
+	\quad
+    \begin{subfigure}{0.3\textwidth}
+    	\centering
+        \includegraphics[width=0.95\textwidth]{./figs/SB-MSC.pdf}
+        \vspace{-8pt}\caption{Result for MSC.}
+	\label{fig:sb_b}
+    \end{subfigure}
+	\quad
+    \begin{subfigure}{0.3\textwidth}
+    	\centering
+        \includegraphics[width=0.95\textwidth]{./figs/SB-U373.pdf}
+        \vspace{-8pt}\caption{Result for U373.}
+	\label{fig:sb_c}
+    \end{subfigure}
+    
+	\vspace{-12pt}\caption{Edge detection results.}\vspace{-16pt}
+	\label{fig:sb}
+\end{figure*}
+
+\section{Evaluation}
+\label{sec:evaluation}
+This section evaluates our fluid framework using four real-world applications. Our goal in this section is {\em not} to defend a particular fluidization strategy for each benchmark and \textit{we do not claim that our fluidization approach is the best one}. Instead, our goal is to demonstrate that Fluid computation can be used to encode various eager execution opportunities across different applications and that doing so can lead to significant reductions in execution times.
+
+\subsection{Evaluation Methodology}
+In our experiments, we used a 20-core Intel Xeon-based platform with 32GB memory. Table~\ref{tab:apps} lists the important characteristics of the four benchmark programs used. 
+
+\noindent\textbf{Input:~} K-means uses four images with different pixel diversities. For Bellman-Ford and graph coloring, we generate input graphs with different characteristics (e.g., number of vertices, number of edges, graph sparsity) to study the input sensitivity of our framework. For edge detection, we choose three EM images from a publicly-available dataset~\cite{unetdataset2,unetdataset}.
+
+\noindent\textbf{Error Metrics:~} For K-means, we compute the squared Euclidean distance to the cluster centroid for each pixel and sum those distances together. For Bellman-Ford, we first normalize the path length for each destination vertex to the actual shortest path and then compute the average error. For graph coloring, the error metric we employ is the graph's spectral number, normalized with respect to spectral number produced by non-eager execution of the (already approximate) original algorithm. Finally, we use PSNR \cite{edgedetect} (Peak Signal to Noise Ratio) as our error metric for edge detection. 
+
+\subsection{SSSP: Bellman-Ford}
+The Bellman-Ford~\cite{bellman-ford} algorithm uses an array that records the distance from a given source vertex to all other vertices of the input graph. This array is updated for $n$ iterations, where $n$ is the number of vertices in the graph. In each iteration, all edges are used for relaxing and updating the distance array. In the baseline version, each iteration of relaxing waits for the previous iteration to finish, since it needs an up-to-date version of the distance array. For both count and stability fluidization approaches, we consider the ``previous'' iteration as the ``producer'' and the ``current iteration'' as the ``consumer''. The current iteration will again be the ``producer'' for the next iteration, and so on. In the count fluidization version, the consumer ($i+1$-th iteration) starts after a fraction of the edge relaxations in the $i$-th iteration have been applied to the distance array. We employ a count valve with two parameters: i) a counter recording the number of edges relaxed in the producing iteration, and ii) a threshold. In the stability version, we consider the distance array to be stable when a certain fraction of the vertices have {\it not} been updated in the previous $k$ iterations. Specifically, we setup a valve guarding the $(i+1)$-th iteration that continuously checks whether the distance array is stable. The $(i+1)$-th iteration starts only when the valve is satisfied or the $i$-th iteration completes.
+
+Figure~\ref{figs:bf} shows the execution time and accuracy results for both non-eager and fluidized Bellman-Ford. In all the count valve experiments, we set the threshold to 20\%, which indicates that the next iteration starts its execution when 20\% of the edges have relaxed by the previous. For stability, we consider the distance array to be stable when 20\% of the vertices have not been relaxed in the past 8 iterations. We make the following observations: i) in the dense graph (5K\_2M and 1K\_400K) case, the fluidized version achieves more benefits than in the sparse graphs (5K\_200K and 1K\_100K) cases, since in the former, we are able to overlap more edges in each iteration. ii) in all the experiments, we achieve the correct shortest path for all the vertices. This is because, for non-pathological graphs, each vertex tends to only update its neighbors very few times~\cite{fanding1994faster}, and subsequently, skipping some of the execution does not effect the result in any significant way. iii) compared to the count-based fluidization, the stability-based fluidized version performs differently across the inputs, since %different (input) graphs react to the stability valve differently. More specifically, while 
+some of the graphs become stable after only few iterations and the consumers in such graphs start their executions quite early, while some other graphs become stable only towards the end of application execution.  
+
+
+
+
+\begin{figure*}[t]
+\vspace{4pt}
+\centering
+    \begin{minipage}{.3\textwidth}
+    \centering
+	\includegraphics[width=0.95\textwidth]{figs/KM-single.pdf}
+	\vspace{-8pt}\caption{Results for K-means clustering with four different inputs.}
+	\label{figs:km-single}
+    \end{minipage}\hspace{0.cm}
+    \begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{figs/KM-early.pdf}
+    \vspace{-8pt}\caption{Results of K-means clustering with early termination.}
+    \label{figs:kmeans-et}
+    \end{minipage}
+    \begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{figs/KM-multi.pdf}
+    \vspace{-8pt}\caption{Results of multi-threaded K-means clustering.}
+    \label{figs:kmeans-multi}
+    \end{minipage}\vspace{-8pt}
+\end{figure*}
+
+\subsection{Graph Coloring}
+\label{sec:gc}
+We use an implementation of (randomized, approximate) graph coloring~\cite{hpca} as our baseline. This algorithm first assigns a random weight to each vertex, assigns a color to a vertex if its weight is greater than those of all its "uncolored" neighbors, and removes any vertices so colored. This process iterates until all vertices are assigned colors. Similar to Bellman-Ford, we treat the $i$-th iteration of this process as ``producer'' and the $(i+1)$-th iteration as consumer. The fluid object here is the partially colored graph.
+
+The count valve contains two parameters. The first one is a counter that records the number of vertices that have been colored in the $i$-th iteration (producer). The second parameter is a threshold. The $(i+1)$-th iteration (consumer) starts its execution when the number of vertices that have been processed in the producer is greater than the threshold. 
+
+Figure \ref{fig:gc} sweeps the threshold parameter. First, as the threshold decreases, color count increases (i.e., the error increases), and execution time reduces. Second, with the dense graph (Figure \ref{fig:gc_a}), we achieve a better performance improvement compared to the sparse graph (Figure \ref{fig:gc_b}). This is because, in the former, the workload in each iteration is heavier than that in the latter. As a result, the time saved is more significant compared to the Task launch overhead. 
+
+%We use normalized color count to the baseline as the error metric to evaluate the accuracy of the algorithm. The lower the more accurate.
+
+
+\subsection{Edge Detection}
+\label{sec:sb}
+The original algorithm employs two filters: Gaussian and Sobel~\cite{edgedetect}. Gaussian reduces noise and generates a smoother image, whereas Sobel calculates the gradient on the smoothened image. Note that the pixels on the border of an object are more likely to get a high gradient value, hence have higher ``edge-ness''. More concretely, Gaussian (producer) calculates a regression value for each pixel by point-multiplying the Gaussian kernel and the surrounding pixels to produce a new image and then Sobel (consumer) processes the image generated by Gaussian.
+
+We only use count valve for edge detection. Since each pixel in the image is only updated once by the producer, stability is not clearly applicable. We start the execution of Sobel (consumer) when a fraction of the pixels got their regression values, instead of waiting for the entire image to be filtered by Gaussian (producer).
+
+The results for execution time and accuracy (PSNR) are plotted in Figure~\ref{fig:sb}. When the threshold decreases, the PSNR slightly drops but does not change significantly. This is because, during the execution of the Sobel filter, the Gaussian filter keeps working. Second, the execution time drops by 10\%, since Gaussian is a more lightweight task compared to Sobel. Further, the overheads incurred by Task launch reduce the potential latency benefits from fluidization.
+
+
+\subsection{K-means Clustering}
+\label{sec:km}
+Recall that we already discussed the fluidization of K-means in Section \ref{sec:fluid_lang}. Here, we evaluate the described fluidizations and also use K-means to explore the relationship between Fluid computation and multi-threading and the utility of early producer termination. In all three scenarios (sequential, multi-threaded, early termination) we construct both a count valve and a stability valve variant. Thresholds for count are always set to 25\% of pixels assigned to clusters. Stability thresholds, taking advantage of an observation~\cite{orhan} that most pixels change cluster memberships only a few times, are always set to 40\% of pixels not changing membership in the last four iterations.  To study early termination, the valve settings are identical, but we limit task concurrency to two, which means no more than two tasks can run in parallel. In the multi-threaded version of K-means, the producer function (cluster membership) is parallelized across a partitioned input where each thread assigns cluster membership for the pixels in its allocated segment. All the threads are synchronized before the consumer function (updating-centroid), which remains sequential, starts its execution. The stability valve is identical, but the for the count valve fluidization, we define a vector of counters, one per thread, and then set up a count valve that {\em adds} the values of all the counters in the vector and compares this sum to the 25\% threshold.
+
+%Here we briefly summarize two valves we used for K-means. In the count valve fluidized version, we set up a count valve to control the start of the consumer function. This valve accepts two parameters, namely, a count variable and a threshold. For example, if the threshold is $ (25\%*imagesize)$, it means that the consumer can start its execution after 25\% of the pixels have been assigned their clusters. In comparison, our stability-based fluidized version of K-means takes advantage of an important observation made by prior work~\cite{orhan}:  most pixels change cluster membership only a few times. Motivated by this, we start to execute the consumer function when the image is "stable". 
+
+Figure~\ref{figs:km-single} shows the latency and accuracy results of the baseline and two fluidized K-means implementations across four input images. We run Eagle for 140 iterations since we observe that the baseline converges on Eagle within 140 iterations. Similarly, we run Owl and Human for 160 iterations, and Vehicle for 130 iterations. We observe that employing the count valve saves 59\% of baseline execution time across all inputs because the consumer starts its execution earlier than in baseline K-means. Using stability valves reduces execution time by 58\% since many of the pixels become stable in the later iterations and the image can be prepared for the consumer faster. Accuracy results observed are similar across all inputs, since, in K-means, most pixels are unlikely to change their cluster membership after the first few iterations\cite{orhan}.
+
+\textbf{Evaluation of Early Termination:}
+In a resource-constrained environment, there are benefits from terminating the producer when the consumer task's valves are satisfied. Figure~\ref{figs:kmeans-et} shows the results of K-means with early termination. From the figure, we can observe that: i) count and stablility fluidization achieve 40\% and 31\% improvements, respectively, in execution time, which are lower than the corresponding values in Figure~\ref{figs:km-single}, demonstrating that resource availability can influence the effectiveness of Fluid. ii) the count and stability fluidized versions achieve 54\% and 82\% execution time improvements, respectively, when employing the early termination strategy. This is because deallocating resources from the previous producers allow the current producers to run faster. iii) the early termination significantly benefits the stability-based fluidization strategy. The reason for this is that, in the later iterations, as an image becomes quite stable, the consumer starts very early, even earlier than 25\% of the pixels are processed by the consumer, allowing  successor producers to also start earlier. Consequently, more producer functions run in parallel than with count-based fluidization. 
+
+\textbf{Multi-threaded K-means:} Figure~\ref{figs:kmeans-multi} shows latency and accuracy results for multi-threaded K-means and its fluidized variants. Due to executing centroid-update earlier than in the multi-threaded baseline, the count-based and stability-based versions save 43\% and 57\% of execution time on average, respectively. For this particular benchmark, fluidization benefits the multithreaded case less than the single threaded.  Although we save the same fraction of execution time in the producer (as in the single threaded case), since the producer runs in parallel and the consumer runs sequentially, we save less relative time than in the sequential version.
+
+
+%That is, canceling the previous producer functions brings much more benefits to the stability-based version. 

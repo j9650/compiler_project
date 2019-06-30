@@ -168,6 +168,12 @@
 		<Unit filename="/home/mdl/hzj5142/compiler_project/FluidProject/apps/test_out.h">
 			<Option target="fluid"/>
 		</Unit>
+		<Unit filename="/home/mdl/hzj5142/compiler_project/FluidProject/fluid/data.cpp">
+			<Option target="fluid"/>
+		</Unit>
+		<Unit filename="/home/mdl/hzj5142/compiler_project/FluidProject/fluid/data.h">
+			<Option target="fluid"/>
+		</Unit>
 		<Unit filename="/home/mdl/hzj5142/compiler_project/FluidProject/fluid/fluid.h">
 			<Option target="fluid"/>
 		</Unit>

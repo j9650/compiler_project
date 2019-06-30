@@ -4,6 +4,7 @@
 #include "signal.h"
 #include "syncds.h"
 #include "valve.h"
+#include "data.h"
 #include "guardscheduler.h"
 #include "guardstates.h"
 
@@ -15,6 +16,7 @@
 #include <utility>
 #include <functional>
 #include <iostream>
+#include <map>
 
 
 class GuardScheduler;
@@ -47,6 +49,9 @@ public:
 	std::set<Valve*> vs;
 	std::set<Valve*> endvs; // addding end valves
 	std::set<Guard*> children; // adding children for end checking
+	std::map<Data*, int> parent_version;
+	std::map<Data*, int> request_version;
+	bool is_leaf;
 	DetachedThread* worker;
 	DetachedThread* scheduler;
 	GuardScheduler* gs;
@@ -61,6 +66,7 @@ public:
 	Guard(GuardScheduler* _gs, std::string guardname, std::set<Valve*> _vs, std::set<Valve*> _endvs, GuardTask* t, std::set<Guard*> _producers) {
 		
 		init(_gs, guardname, _vs, _endvs, t, _producers);
+		is_leaf = false;
 		//start();
 	}
 	Guard(GuardScheduler* _gs, std::string guardname, std::set<Valve*> _vs, GuardTask* t, std::set<Guard*> _producers) {
@@ -68,6 +74,8 @@ public:
 		init(_gs, guardname, _vs, t, _producers);
 		//start();
 	}
+
+	void set_leaf() { is_leaf = true; }
 
 	virtual void init(GuardScheduler* _gs, std::string guardname, std::set<Valve*> _vs, std::set<Valve*> _endvs, GuardTask* t, std::set<Guard*> _producers);
 	virtual void init(GuardScheduler* _gs, std::string guardname, std::set<Valve*> _vs, GuardTask* t, std::set<Guard*> _producers);

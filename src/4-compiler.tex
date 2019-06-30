@@ -1,0 +1,26 @@
+\section{Compiler Support}
+\label{sec:fluid_compiler}\label{sec:code-gen}
+We implement a source-to-source translator that maps a fluidized application code into an equivalent C++ code.
+Our translator consists of three main steps: i) initial scanning, ii) scope analysis, and iii) code generation. 
+To show how our translator works in practice, we focus on the K-means code from Figure~\ref{figs:kmeansfluid}, and discuss the compiler-generated code after the translation shown in Figure~\ref{figs:code-gen}. Initial scanning scans the whole program and detects all $\_\_Fluid\_\_$ flags. Scope analysis also scans the entire program and determines which class scope each fluid statement belongs to. The resulting scope information facilitates the subsequent code generation phase. In Figure~\ref{figs:code-gen}, we mark the compiler-generated statements in red and list the original statements as comments. 
+
+
+\begin{figure}
+\centering
+\includegraphics[width=0.45\textwidth]{figs/lan_obs.pdf}
+\vspace{-10pt}\caption{Code example of initial scanning translation.}\label{figs:lan-obs}\vspace{-12pt}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.47\textwidth]{figs/code_gen.pdf}
+\vspace{-8pt}\caption{K-means code after source-to-source translation.}\label{figs:code-gen}\vspace{-16pt}
+\end{figure}
+First, the translator collects all $\#pragma\ counts$, and translates them into target code. For example, in Figure~\ref{figs:lan-obs}, \textbf{procPixel()} is stripped out from the count pragma, and code is generated to enable $counter$ to increment after each execution of \textbf{procPixel()} (\circledwhite{A}). For a $\_\_count\_\_$ variable wrapped in the count pragma (\circledwhite{B}), we construct an internally-defined class $\_\_count\_\_$ and initialize it to 0. Then, the fluid objects with stability property and the stability check functions are stripped out from the stability pragmas (lines 4 and 5).  Next, we canonicalize the stability check function naming ($stable\_check()$) and add the argument types in the valves (lines 7 and 9). The $ValveCT$ valve is assigned the type of $int$ since the counter has an integer value. $ValveST$ is more involved; the first argument type of $ValveST$ is a pointer to the class, where the class name is the same as the scope name (derived from scope analysis) of this statement. The types of the remaining arguments are the same as the types of the arguments in the $stable\_check()$ function since the $ValveST$ valve invokes $stable\_check()$ internally to check whether the fluid object is stable or not.
+
+Second, our compiler translates the statements of the tasks to the target code. For example, task $t2$ in line 42 is translated to the code encapsulated between lines 43 and 46. The first statement generated (line 43) is a call to the $init$ function of the valve, to construct a new valve which will be used in the following statements. For the count valve (line 43), the parameters of $init$ are the same programmer-provided parameters in the valve on line 42. For a stability valve (line 28), the first parameter is an $\_\_object\_\_$ with the template type of a class pointer (line 27). This class has the same scope as the current task statement. For example, line 26 is in the scope of $KmeansImage$, and the type of $\_\_object\_\_$ is $KmeansImage*$. The remaining parameters are the same as the programmer-specified parameters from valve definition on line 26. If a task does not contain any valve, we do not need to generate this valve statement. Recall from the previous section that a task contains a guard ($<<<\ >>>$) and a function ($func()$). The next statement is a call to the "std::bind()" function, which binds $func()$ and its parameters (line 44). If this task contains a counter to count the number of updates to the fluid object by the producer (e.g., line 38), we insert a $placeholder$ to reserve a place for the counter. In the third statement (line 45), we construct a $Function$, which is an internal class, by calling the $newFunc()$ with the previous bound function as the parameter. If that task is associated with a counter, we put the counter pointer as another parameter of $newFunc()$ (e.g., line 40). For the remaining statements in line 46, we use an internal function $newGuard()$ to organize the guard and the function together. This function has the parameters of a set of valves that are listed in line 42, $Function$ we construct in line 45, and a set of producers listed in line 42.
+
+
+After the code generation for the tasks, since some of the tasks are associated with the counter (e.g., task $t1$ in line 37), we next record the function names in those tasks (e.g., \textbf{AssignCluster}), and the translator changes the definition of those functions by inserting a new parameter $int\ *counter$ (lines 11 and 15). This counter is used to record the number of updates on the fluid object in that function.
+
+Finally, we add a $TaskManager$ as a member to each Fluid class (line 13). $TaskManager$ contains a list of guards and a list of functions. Each <$guard$, $function$> pair in the list corresponds to a task. We further discuss $TaskManager$ and how it schedules tasks in Section~\ref{sec:fluid_runtime}.

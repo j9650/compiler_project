@@ -4,7 +4,9 @@
 #include <list>
 #include <set>
 #include "guard.h"
+#include "data.h"
 //https://stackoverflow.com/questions/16868129/how-to-store-variadic-template-arguments
+
 namespace helper
 {
 	template <int... Is>
@@ -77,8 +79,8 @@ public:
 	Guard* guard;
 	bool finish;
 	GuardTask * parent;
-	std::set<void*> input;
-	std::set<void*> output;
+	std::set<Data*> input;
+	std::set<Data*> output;
 	virtual void run() = 0;
 	virtual void setGuard(Guard* g ) = 0;
 	virtual bool* isfinished() = 0;
@@ -102,7 +104,7 @@ private:
 	int agn;
 public:
 
-	Tasklet(std::string taskname, int _agn, F f, Ts... ts) :name(taskname) {
+	Tasklet(std::string taskname, int _agn, F f, Ts... ts) : name(taskname) {
 		parent = NULL;
 		act = new Action<F, Ts...>(f, ts...);
 		guard = NULL;
@@ -110,13 +112,24 @@ public:
 		agn = _agn;
 	}
 
-	Tasklet(std::string taskname, F f, Ts... ts):name(taskname) {
+	Tasklet(std::string taskname, F f, Ts... ts) : name(taskname) {
 		parent = NULL;
 		act = new Action<F, Ts...>(f, ts...);
 		guard = NULL;
 		finish = false;
 		agn = 0;
 	}
+
+	Tasklet(std::string taskname, std::set<Data*> input_, std::set<Data*> output_, F f, Ts... ts) : name(taskname) {
+		parent = NULL;
+		input = input_;
+		output = output_;
+		act = new Action<F, Ts...>(f, ts...);
+		guard = NULL;
+		finish = false;
+		agn = 0;
+	}
+
 	void run(){
 
 		SyncLogger::print("before act");
@@ -137,6 +150,12 @@ public:
 
 	void setGuard(Guard *g) {
 		guard = g;
+		for (Data *output_data : output) {
+			output_data->set_producer(g);
+		}
+		for (Data *input_data : input) {
+			input_data->set_consumer(g);
+		}
 	}
 	
 	bool* isfinished() {
@@ -164,6 +183,14 @@ public:
 	template <typename F, typename... Ts>
 	GuardTask* newTask(std::string taskname, F f, Ts... ts) {
 		auto task = new Tasklet<F, Ts...>(taskname, f, ts...);
+		//tasklist.insert(task);
+		task->parent = parentTask;
+		parentTask = task;
+		return task;
+	}
+	template <typename F, typename... Ts>
+	GuardTask* newTask(std::string taskname, std::set<Data*> input_, std::set<Data*> output_, F f, Ts... ts) {
+		auto task = new Tasklet<F, Ts...>(taskname, input_, output_, f, ts...);
 		//tasklist.insert(task);
 		task->parent = parentTask;
 		parentTask = task;

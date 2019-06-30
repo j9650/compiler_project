@@ -1,0 +1,96 @@
+
+\section{Runtime Support}
+\label{sec:fluid_runtime}
+\label{sec:exe-mode}
+In this section, we discuss the details of our runtime system support. The implemented runtime supports two task execution models for use in Fluid computation.
+
+\noindent\textbf{Run-to-Completion}: The producer continues its execution, even if the consumer valve involved is satisfied and all consumer functions have already started their executions. As a result, during the consumer's execution, the consumer may read values updated after it has begun execution. 
+
+\noindent\textbf{Early-Termination}: As soon as \textit{all} valves for \textit{all} consumers are satisfied, the execution of the producers is terminated. Early termination can save CPU cycles, but may require differently-tuned thresholds than run-to-completion to assure the same output quality. The \text{early termination} model also causes the execution to finalize the value of the fluid object, simplifying subsequent consumer view consistency.
+
+\subsection{Design Considerations for a Task}
+As described in Section~\ref{sec:fluid_lang}, a Task is defined as a <guard, task function> pair. We decouple the design of $guard$ (recall from Section \ref{ssec:formal}) from that of $task\ function$ at runtime, due to their different natures. Specifically, a task function works on the fluid object, whereas the guard is used to ``control'' that function. During the runtime, the task function is executed by a thread ($Worker\ Thread$), which is subject to be terminated by the guard. The runtime work needed for the guard ($Guard\ Thread$) is more involved, as it needs to manage a series of guard states, and spawn or terminate a $Worker\ Thread$. At runtime, there are three main jobs for a $Guard\ Thread$ to handle: 1) monitoring valves as necessary; 2) executing task functions; and 3) stopping task function execution when employing the Early-Termination model. 
+
+
+\noindent\textbf{Monitoring the Valves}: Once a task is created, we can start monitoring its valves. However, since it consumes CPU time, it is not efficient to start checking and waiting on the valves when not necessary and we design a \textit{Task Manager }(discussed later) to wake-up the task to check its valves.
+%checking a given set of valves is not \textit{free} as it needs to poll the \textit{fluid} values and can consume considerable CPU time. Clearly, it is not efficient to start checking and waiting on the valves when not necessary. Observing this, we design a \textit{Task Monitor }(discussed later) to wake-up the task to check its valves.
+
+\noindent\textbf{Spawning Worker Thread}: During the runtime, the $Guard\ Thread$ spawns a worker thread to execute the task function with all the parameters.
+%A worker thread is responsible for executing the task function. At compile time, the worker thread's function is initialized by the task function, which may have any number of parameters, each potentially being of a different type. 
+The compiler automatically adapts the task function code for the task construction. Also, if the task function is under an object context, it should be bound to the object and execute under that object's context. Once a task function is accepted, the Task is able to execute the function at any time. 
+
+\noindent\textbf{Ability to Stop a Task Function}: For the Early-Termination execution model, the producer function can be stopped at any moment when all its consumers' valves are satisfied. Therefore, the producer will collect these early stop requests from the consumer Tasks, and kill the corresponding $Worker\ Thread$.
+
+\begin{figure}[t]
+    \centering
+    %\vspace{-20pt}
+        \includegraphics[scale=0.65]{figs/states.pdf}
+\vspace{-12pt}\caption{Guard thread states. A guard thread is initialized to the ``Start'' state, and terminates at the ``TERM'' state.}\label{figs:task_states}\vspace{-4pt}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \vspace{-4pt}
+        \includegraphics[width=0.45\textwidth]{figs/statedsc.pdf}
+    \vspace{-8pt}\caption{Explanation of the guard thread states.}\label{figs:statedsc}\vspace{-18pt}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+        \includegraphics[width=0.45\textwidth]{figs/timeline.pdf}
+    \vspace{-20pt}\caption{An example task timeline.}\label{figs:timeline}\vspace{-16pt}
+\end{figure}
+
+\subsection{The Guard Thread State Machine}
+To fulfill these design considerations, we implemented a task using two separate threads, namely, \textit{Guard Thread} (GT) and \textit{Worker Thread} (WT). The Guard Thread is an implementation of the guard discussed in Section\ref{ssec:formal}, which communicates with other Guard Threads as well as the \text{Task Manager}. We implemented it as a \textit{state machine} that contains four states. The Guard Thread keeps checking a set of valves and launches a Worker Thread when \textit{all} the valves are satisfied. It also keeps receiving the signals from a signal queue to deal with requests from the other Guard Threads.
+
+\noindent\textbf{The State Machine:}
+We abstract the two execution models into a state machine, as shown in Figure~\ref{figs:task_states}. The Guard Thread has four states (Start, Check, Run, and Complete(COMP)/Terminate(TERM)) and four events/signals (\texttt{SigCheck}, \texttt{SigRun}, \texttt{SigComp}, \texttt{SigTerm}). Figure~\ref{figs:statedsc} gives the detailed descriptions of these four states. 
+
+Figure~\ref{figs:timeline} provides an example to explain the state transitions and a Task's runtime behavior. Once a Task is created, it creates its Guard Thread and initiates it to the \textbf{Start} state. A \texttt{SigCheck} signal is sent from Task Manager and, upon receiving it, the Guard Thread moves to the \text{Check} state. It starts checking the valves till all the valves are satisfied. Once the valves are satisfied, it moves to the \textbf{Run} state and launches the Worker Thread. Sometime later, the Guard Thread either receives a \texttt{SigTerm} signal from its consumer or the Worker Thread finishes, meaning that the task can stop its execution. In this case, Guard Thread terminates its execution (cancels the Worker Thread if it had received a \texttt{SigTerm} signal from consumer) and sends a \texttt{SigComp} to the Task Manager.
+
+\subsection{Task Manager}
+We designed an independent Task Manger (TM) for three reasons. First, when a Task is created, the Guard Thread immediately starts checking its valves. Since Tasks are not synchronized, it may happen that many Tasks do so simultaneously despite the fact that the Fluid object the valve depends on has never seen any updates. Such over-eager polling can incur excessive CPU time and contend with real work threads. Second, the manager provides a developer interface for synchronizing two tasks. Third, the manager enables developer control over the global number of concurrent threads executing simultaneously.
+
+The Task Manager is created as an independent thread at the beginning of the program and manages tasks via a \textit{centralized} task queue. When a Task is created, it registers itself with the Task Manger in the original program order. A user can specify the number of concurrently running Tasks (denoted as NumTask). If it is not set by the user, our compiler determines the number of available cores, and uses that number as the default NumTask. Once NumTask is set, it is used as the initial number of tokens. Whether a Task needs to start checking or not depends on two parameters: the number of tokens left in the Task Manager and whether the producer of the task has started. Once launching a Task, the token is decremented by one, and the launched Task starts checking the valves. If the number of tokens is less than zero, it means there are NumTask concurrent Tasks running, and no more Task should be launched. When a Task finishes its execution, or is terminated, it sends a SigComp signal to Task Manger and also returns the token to the task manager.
+
+
+
+\ignore{
+\begin{figure}[t]
+    \centering
+        \includegraphics[width=0.4\textwidth]{figs/taskmanger.pdf}
+\vspace{-8pt}\caption{Runtime  diagram of Task Manager. $A_n$ represents the $n$-th invocation of \textit{Assign} in K-Means, and $R_n$ represents the $n$-th invocation of \textit{Recenter}.}\label{figs:taskmanger}\vspace{-16pt}
+\end{figure}
+}
+
+\renewcommand{\tabcolsep}{2pt}
+\begin{table*}[t]
+\scriptsize
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Application}&  \textbf{Error Metric} & \textbf{Input}& \textbf{Fluidity}\\\hline \hline
+\multirow{4}*{Bellman-Ford~\cite{bellman-ford}} & Distance: & 5K\_2M: 5,000 (V) 2,000,000 (E) & Producer/consumer: relaxing all the edges. \\ \cline{3-3}
+& total distance  & 5K\_200K: 5,000 (V) 200,000 (E) & Count: start next iteration of edge relaxing when part of the relaxing in previous iteration finishes. \\ \cline{3-3}
+& normalized to  & 1K\_400K: 1,000 (V) 400,000 (E) & Stable: start next iteration of edge relaxing when certain portion of vertexes  \\ \cline{3-3}
+& shortest distance. & 1K\_100K: 1,000 (V) 100,000 (E) &  did no update its neighbors in several iterations.\\ \hline
+
+\multirow{2}*{Graph Coloring~\cite{hpca}} & Normalized & 5K\_2M: 5,000 (V) 2,000,000 (E) & Producer/consumer: assign colors to the vertex which has largest local random value. \\ \cline{3-3}
+& color count  & 5K\_200K: 5,000 (V) 200,000 (E) & Count: Consumer starts when some portion of the vertexes are checked in Producer.
+ \\ \hline
+
+\multirow{3}*{Edge Detection~\cite{edgedetect}} & Peak & HeLa~\cite{unetdataset}~\cite{unetdataset2}: 512*512 & Producer: Gaussian filter. \\ \cline{3-3}
+& signal to   & MSC~\cite{unetdataset}~\cite{unetdataset2}: 1200*782& Consumer: Sobel filter \\ \cline{3-3}
+& noise ratio (PSNR) & U373~\cite{unetdataset}~\cite{unetdataset2}: 696*520 & Count: start execution of sobel filter when some of the pixels finish Gaussian filter.\\ \hline
+
+\multirow{4}*{K-means~\cite{kmeanspaper}} & Distance: & Eagle~\cite{kmeanspaper}: 512*512 & Producer: assign cluster-ship for each input pixel. Consumer: recalibrate centers of clusters. \\ \cline{3-3}
+& total square  & Owl~\cite{kmeanspaper}: 512*512 & Count: Consumer begins when certain portion of input pixels are assigned cluster-ship. \\ \cline{3-3}
+& distance to  & Human~\cite{kmeanspaper}: 512*512 & Stable: Consumer begins when certain portion of input pixels \\ \cline{3-3}
+& centroid. & Vehicle~\cite{kmeanspaper}: 512*512 & did not change from previous several iterations. \\ \hline
+
+\end{tabular}
+\caption{Important characteristics of our workloads and their fluidization.}\label{tab:apps}\vspace{-16pt}
+\end{table*}
+
+\subsection{Discussion}
+We now emphasize three important points. First, apart from Fluid variables, producer and consumer methods and valve methods, a Fluid class is a normal class. Consequently, it can contain other (non-fluid) data and member functions that operate them. Also, both producer/consumer/valve methods and other methods can access both fluid and non-fluid data. In fact, if we strip off all Fluid keywords and all pragmas from a fluidized application, the resulting code would be a sequential application that enforces conventional (non-eager) execution. Second, the same Fluid object can expose fluidity to multiple code fragments in the same or different ways. For example, code fragment $A$ can call a producer member of Fluid object $F$ to update its fluid data $X$, and the same data can also be updated by some other code fragment, say, $B$. $X$ can be checked by potentially different types of valve functions and different consumer members of $F$ can be enabled by different combinations of the valves. Or, the same Fluid object $F$ can contain different types of Fluid data (say, $X1$ and $X2$) that are updated/checked by different producer members and valve members. All these possibilities give a wide flexibility to a Fluid programmer in employing eager execution. Third, while Fluid computation can be used in all three scenarios discussed in Section 1, our focus in this paper is on a subset of approximable programs where one can achieve significant performance improvements via eager execution without sacrificing too much accuracy.

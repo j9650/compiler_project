@@ -1,0 +1,29 @@
+Detached Thread:   ===AggressiveGS===   Running  ( 139905929312000 )
+before act
+Detached Thread:  GuardKernel1::Guard mainThread__   Running  ( 139905918822144 )
+GuardKernel1::Guard Start
+send check to  GuardKernel1::Guard 0 1 2
+Detached Thread:  Docolor1::Guard mainThread__   Running  ( 139905908332288 )
+Docolor1::Guard Start
+send check to  Docolor1::Guard 1 2 1
+before  GuardKernel1::Guard 	 Handling
+GuardKernel1::Guard 	 Handling Check
+before  GuardKernel1::Guard 	 Handling
+GuardKernel1::Guard 	 Handling Start
+Guard-0 Detached Thread:  GuardKernel1::Guard's task   Running  ( 139905897842432 )
+Guard-0 before  GuardKernel1::Guard 	 Handling
+Guard-0 before  Docolor1::Guard 	 Handling
+Guard-0 Docolor1::Guard 	 Handling Check
+Guard-0 before  Docolor1::Guard 	 Handling
+Guard-0 Docolor1::Guard 	 Handling Start
+Guard-1 Detached Thread:  Docolor1::Guard's task   Running  ( 139905808201472 )
+Guard-1 before  Docolor1::Guard 	 Handling
+Guard-1 before act
+Guard-1 GuardKernel1::Guard 	 Handling Completed
+Guard-1 COMPLETE>>>>>>>>>> GuardKernel1::Guard Wall:  1.55372e+12 CPU: -4.2076e+15
+Guard-1 GUARDFINSHED@@@@@@@@ GuardKernel1::Guard Wall:  12.1345 CPU: 10
+Guard-1 Scheduler::: XXXXXX GuardKernel1::Guard 0 0 1 0
+Guard-1 GuardKernel1::Guard nextGuardToStart 0 2 1
+Guard-1 before act
+Guard-1 Docolor1::Guard 	 Handling Completed
+Guard-1 Fluid CPUTimer:  20  WallTimer:  24.7346

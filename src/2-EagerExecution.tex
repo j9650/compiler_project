@@ -1,0 +1,232 @@
+\vspace{-0.1in}
+\section{Enabling Eager Execution on \emph{Fluid} Data}
+\label{sec:eagermodel}
+The concept of eagerly initiating a computation before all of its data and control dependencies have been fully satisfied has been explored for a considerable number of approaches in both software and hardware, including eager evaluation~\cite{eager}, continuation compilation~\cite{continuation}, software pipelining~\cite{lam1988software}, runahead execution~\cite{mutlu2003runahead}, speculative execution~\cite{speculative}, anytime automation~\cite{miguel2016anytime}, branch prediction~\cite{hu2003using}, and value prediction~\cite{lipasti1996value}. Each of these approaches exists as an extension of an underlying execution model which entails a particular form of initial sequential and/or parallel dependencies that the eagerness mechanism then relaxes. In this work, we extend a {\em task-centric} execution model, wherein the triggering of a task is guarded by the readiness of all variables (for simplicity in exposition, one may presume the variable to be an entity similar to a C++ or other class-type object) that are live-in to the task. This model allows both parallel and sequential task invocation orderings to be specified in terms of both their data flows, through the variables, and control flows, within the definition of a specific task. While all tasks in this model are logically guarded/triggered, in practice, many of the conditions will be degenerate and can be inferred conservatively except where parallelism is explicitly described by a programmer.
+
+We extend our underlying task-based execution model with a restricted, data-centric model of "eagerness" wherein we allow for the possibility of a new type of variable that self-manages early access to its encapsulated data by both (encapsulated) data producer and data consumer invokers of the variable's methods. This early access will continue to enforce local invariants (e.g., that, for example, all three fields of an RGB pixel structure are assigned atomically from the perspective of any other object/task), but will also allow, based on a programmer-specified criteria for relaxing the triggering condition from "data ready", consumer requests to proceed {\em prior} to when the original execution model would have triggered the dependent task. We consider two scenarios with respect to this early triggering, one in which the  ongoing producer task(s) continue after the consumer task(s) have been triggered, and one where the triggering of all consumers terminates any ongoing production tasks. We term objects with these properties as \emph{Fluid objects/variables}, the data within them as \emph{Fluid data}, and code operation upon Fluid variables as \emph{Fluid computation} because Fluid variables expose a more continuous, or, {\em fluid}, notion of the state of the data that will be consumed in a producer-consumer relationship, as opposed to the more binary notion of ready/not-ready.\footnote{Where there is no confusion, we use the terms "Fluid object", "Fluid data" and "Fluid variable" interchangeably.}
+%In addition to the differing degrees of exposed parallelism and resource requirements, this will represent tradeoffs between ease of complexity in managing producer-consumer data races through the Fluid variable versus higher fidelity in cases where subsequent producer efforts still increase consumer accuracy.
+
+%Under this definition, one can consider each object that supports eager access as the manager of a set of (logical) versions of its encapsulated data. Each such object will impose its own local consistency constraints among multiple fields and within non-scalar data members in order to present, to each method call allowed to proceed eagerly, some meaningful intermediate version or versions of the value that the object would have assumed under non-eager execution. 
+
+%restricted view of thecompliantthat each input to a consumer task as being an ordered set of \textit{versions} of the input value produced over time by the actions of one or more producer tasks. Each version is an ``intermediate value'' of data which the consumer could take as input to perform its computation. 
+\vspace{-0.05in}
+\subsection{An Abstract Model for Fluid Computation}
+%Any implemented model for eager execution must embody several key decisions relating to how and when specific views of premature/incomplete data become visible to consumers, how and when these versions are consumed, and whether and how to resolve any divergence in execution arising due to the differences between the value of the version consumed and the value that would have been produced in a conservative execution, among decisions in other dimensions.  At a higher abstraction level, however, eager execution approaches can be described in terms of only two key control functions encapsulating a work task, be that task a single instruction or an entire kernel. The first of these control functions, the \emph{Trigger Condition}, specifies the conditions under which eager execution should be attempted, and the second, the \emph{Validation Condition}, specifies the circumstances under which the results of eager execution should be considered acceptable, leaving aside all details of enforcement. For instance, branch prediction can be described in this way with instruction fetch as the task, the branch predictor function as the trigger, and branch resolution as the validation. Similarly, an approximate real-time image processing kernel may have a time-based trigger and a degenerate validation condition (e.g. "true").
+
+A Fluid computation must make key decisions relating to how and when specific views of premature/incomplete data become visible to consumers, how and when these versions are consumed, and whether and how to resolve any divergence in execution arising due to the differences between the value of the version consumed eagerly and the value that would otherwise have been observed. Eager task execution and its resolution in Fluid computation can be described in terms of \textit{Valve} and \textit{Validation} functions for tasks that determine when a task can trigger eagerly and whether that eager execution was acceptable, respectively. While these functions are application-specific and, in the most general case, arbitrarily complex, their ranges can be succinctly specified. In a Fluid computation, the earliest point at which a consumer requesting data from a Fluid variable could start its execution is as soon as all of its input parameters have any well-typed value associated with them. Mapping the Valve condition onto the set of all updates that would have occurred to a Fluid variable over its lifetime in a non-eager execution timeline yields a range of 0\% updated $\leq$ Valve Condition $\leq$ 100\% updated. The range of the Validation condition is best considered mapped onto an abstract similarity dimension for task output that would be specific to the code being executed. Thus, task output fidelity ranges from 0\% $\leq$ Validation Condition Satisfied $\leq$ 100\%. Note that, in practice, the Validation condition could be applied indirectly, e.g. at the end of an entire program or kernel execution, to implicitly judge a set of entangled eagerness decisions rather than the result of each individual eager method invocation.
+
+Clearly, by setting all Valves to their most conservative point, the model can subsume {\em non-eager execution.} Likewise, by setting Validation to its most conservative point and setting the Valve to some eagerness condition, the model covers speculative techniques, while by setting both Valve and Validation non-conservatively, it covers a broad range of approximation techniques both with and without well-defined bounding properties. While this work aims to develop language extensions capable of this full range of general behaviors, the primary focus of this paper will be on expressing computations of the lattermost class of approximate computations, with Validation occurring outside the scope of fluidized code. As such, in describing our system, we focus on detailing the interactions between Fluid variables, their Fluid data contents, Valve conditions, and the execution of method invocation tasks on Fluid variables, leaving an in-depth discussion of Validation functions to future work.
+
+%Thus, setting the Trigger condition to $\geq$ 0\%(e.g. "true") would be a programmer specifying that dependencies can be ignored when considering when to begin consumer execution, and setting Trigger to "100\% updated by all potential antecedents" would enforce a non-eager, data-dependent execution.  Here, the 0\% bound represents undisciplined approximation, and the 100\% bound indicates precise, identical computation, e.g. as in branch prediction. 
+
+
+\subsection{A Fluid Computation Example} 
+
+\begin{figure}
+\centering
+\includegraphics[width=0.45\textwidth]{figs/code}
+\vspace{-12pt}\caption{An example producer-consumer relationship and its potential fluidization.}\label{figs:code}\vspace{-32pt}
+\end{figure}
+
+To see how Fluid computation will operate on Fluid variables, consider the code example in Figure~\ref{figs:code}(a). Assume that f and g are objects of the same class type {\tt FOO} with a large number of internal member fields (e.g. internal array data) associated public methods {\tt mutateMe()} and {\tt int readGist()} and private method {\tt checkNextField()} called repeatedly by {\tt mutateMe()} and that h is an object of class type {\tt BAR} with associated method {\tt FOOGistSum (int, int)}. Assume that {\tt readGist()} returns a collective property of the fields in an instance of FOO (e.g., a weighted average, etc.) and that only some calls to {\tt checkNextField()} will modify the state of a {\tt FOO}. In a traditional execution, while both calls to {\tt mutateMe() } might proceed in parallel, each call must complete before the {\tt readGist()} call on the same object can be executed, and {FooGistSum} will not proceed until its inputs are computed. To transform this into a Fluid computation (Figure~\ref{figs:code}(b), i.e., to \textit{fluidize} it, a set of simple changes are performed: FOO becomes a Fluid class, $Guard$ functions are introduced to summarize the Boolean set of met and unmet conditions that would allow each instance of {\tt readGist()} to proceed, and \emph{Valve} functions, with Boolean outputs, are associated with the progress of the producing method {\tt mutateMe()} so that the fluid transition of a {\tt FOO} through its intermediate states can be monitored. These guard and valve functions collectively implement the triggering condition for Fluid computation. In this example, the Valve relates the number of calls to the private method {\tt checkNextField()} as a proxy for the completion of the {\tt mutateMe()} method. 
+
+Multiple types of $eagerness\ opportunities$ can be exploited even in this simple example. The programmer may simply speculate that, if most of the calls to {\tt checkNextField()} have occurred, the output of {\tt readGist()} may be nearly correct, independent of subsequent updates being observed or not. Alternatively, the programmer may observe that both methods access fields in the same order, and look to exploit eagerness by speculating that data races between the two methods are unlikely as long as the producing function gets a sufficient head start. We want to emphasize that both can be expressed through the use of $valves$ and $guards$; both could even be employed at the same time, with one approach for fluidity in f and another in g. Further, while both input expressions to {\tt FooGistSum} involve evaluating methods on instances of fluid variables, h need not be a fluid variable and {\tt FooGistSum} can still be conservatively dependent on values returned only at the full completion of the eagerly executed methods. To highlight the value of differentiated guard and valve functions, consider a further modification to expose intermediate values of {\tt readGist()} in order to eagerly execute {\tt FooGistSum}: In such a scenario, a programmer may wish to specify that the valve condition on both of the two inputs are met before invoking the method; other multi-input functions could clearly prefer to trigger on any of their inputs achieving some specified degree of partial readiness.
+
+\vspace{-0.25in}
+\subsection{An Implementable Fluid Computation Model}
+Below, we describe the choices that guide the selection of language extensions and design of accompanying framework features used for concisely expressing and managing eager execution in the Fluid computation model. In addition to decisions regarding Valve support and Guard-Task association, as an implementable system, Fluid computation also imposes restrictions on task granularity, allowed communication channels, and synchronization among tasks.
+
+\noindent\textbf{Granularity:} For our Fluid computation framework, we choose to explore eager execution only at the granularity of method invocations on Fluid objects. We believe the function-granularity data flow graph is a natural level at which to consider eagerness for which the programmer can reason about Valve conditions in terms of program-level variables and their relationship to application semantics. While this approach could eventually be extended to arbitrary producer-consumer relationships in functional or other programming paradigms, restricting all eager producer-consumer communication to occur via methods bound to a particular data type greatly eases the implementation of analysis tasks.
+%Let us consider an example of data flow graph shown in Fig.~\ref{figs:code}, functions {\tt F()} and {\tt G()} produce data $f$ and $g$, respectively. Function {\tt P(f,g)} depends on {\tt F()} and {\tt G()} as it consumes the produced data $f$ and $g$. Note that we do not restrict our approach to purely functional models and include cases where $f$ and $g$ receive their values through mutation.
+
+\noindent\textbf{Communication:} Our Fluid computation framework relies on the concept of \emph{Fluid Variables}, built atop an object oriented paradigm. Fluid variables regulate all eager data flows, with valve and guard functions assisting in regulating control flows. Fluid variables implicitly manage a logical set of versions of the values of the underlying base type of the original variable that the Fluid variable takes on as it is being updated by a producer method. To exploit eagerness opportunities, the producer-consumer relationship involving a Fluid variable must be made explicit. The propagation of a version of a Fluid Variable to a consumer could occur in either a producer-centric (push) or consumer-centric (pull) fashion. As different consumers in a single-producer multiple-consumer scenario could have very different triggering conditions, we adopt a consumer-centric pull model, wherein the producer method is agnostic of whether or not a consumer method has begun observing the member fields it is producing in their fluid state. In the scope of this paper, we focus on scenarios where full-copy multi-versioning is not required. Objects with more complex internal invariants may need to provide stronger producer method atomicity and consumer method view consistency guarantees to be beneficiaries of Fluid computation.
+%We also consider both version-isolation and concurrent producer-consumer version access semantics within the Fluid Computation framework.
+
+%\sampson{need to check the following for consistency}
+\noindent\textbf{Task Triggering and Synchronization:} In Fluid computation, early task triggering is guarded by a set of Valve functions, each serving to impede the execution of a Fluid variable's methods until either an internal state condition or a degree of update set progress has been reached. Our framework currently supports two types of valve conditions, namely, a $value\ stability$ predicate and an $update\ count\ threshold$ predicate. Currently, to simplify scheduling logic and reduce verbosity for progress based valves, only guards of the form "for all valves$_i$, producer progress $\geq$ A$_i$" are allowed. Similarly, to implement the runtime without imposing large synchronization costs, update count threshold predicates can only specify a minimum threshold for producer progress. The eager invocation of a method is constrained to come after the trigger point, but cannot be bound to occurring at any specific update count or percentage. Correspondingly, it is always valid, in our framework, for the runtime to execute a Fluid computation in a completely non-eager manner.
+
+While the selected design decisions impose restrictions on how eager computation can be implemented efficiently within the Fluid computation framework, our current implementation can still cover a broad selection of eager execution scenarios. By selecting a simplified framing of the trigger conditions suitable to method-invocation granularity and based, with valves, around the notion of fluid variables, our runtime scheduling logic only has to support explicit inter-task synchronization requests and manage the state of a collection of object-local predicates automatically inserted into class definitions based upon programmer-specified producer-consumer relationships and threshold values.
+
+%version identifiers for fluid variables and progress within consumers, rather than the application and insertion of arbitrary predicates, which could otherwise impose complex synchronization requirements in parallel implementations of Trigger conditions. By unrolling the A and Delta pairs in the producer-consumer graph, synchronization events are clearly defined in Fluid Computation to occur at the beginning of pairwise producer-consumer back-slices (for parallel invocation) and at the termination of any QQ function, which can short-circuit on-going execution.
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%% OLD
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%By using Delta to unroll the eagerness conditions, there are multiple dynamic instances of T that can be launched with different inputs. Thus, QQ parameters I and I' are versions of the input to T at invocation of T and invocation of QQ, respectively, and O and O' are the output of this T and the output of the T' invoked with producer step $\geq$ Delta$_i$ for all producers $i$. B is used as the bound on the output of Q to either accept or reject an eager execution. If eval(QQ) $\geq$ B and A $<$ 100\%, then QQ will be evaluated for the next instance of T until either QQ satisfies B or T has been evaluated with A=100\%.
+
+%It manages Trigger functionalities for a task \textit{T} via  our parameters: Producer completion percentages \emph{A} and \emph{Delta}, mismatch percentage tolerance \emph{B}, and Quality-Quantification function \emph{QQ}(I,I',O,O') with output in range 0-100\% mismatch and where I and I' are input sets from different points in producer progress and O and O' are consumer output sets associated with triggering the consumer at different points in producer progress where the different points in producer progress are at least Delta apart.
+%while leaving the Validation functionality application specific via the user-defined behavior of QQ. For a given consumer, there may be several valves, each with their own A and Delta, but there will be only one QQ function evaluating the Validation Condition, and only one specified tolerance bound B.
+
+%To ease implementation, we further restrict progress-counting valves to specify only an While A specifies the earliest point in producer progress that a consumer can be triggered, Delta specifies the (maximum) number of other points between A and 100\% producer progress that will be considered, in parallel, as eagerness options for triggering T. To manage multi-producer/multi-consumer scenarios, lowest-common-denominator sets of points among producer-consumer pairs of A and Delta are computed at compile time for the back-slices of each task T. As both A and Delta are minimums, the runtime is free to be more conservative in applying eagerness or evaluating multiple possible eager invocation points than the user has specified. However, for many QQ functions, especially those used for speculation approaches, at least two executions with distinct eagerness points in the producer timeline will be used to generate the I, I', O, and O' inputs to QQ. A Delta value of zero is interpreted to indicate that the QQ function can perform the check directly on I and O and other eager evaluation points will not be considered. Similarly,  if A + Delta $>$ 100\%, the desired eagerness point will be interpreted as producer completion. 
+
+
+
+
+% \subsection{Design Space Definition}
+% For each of the aforementioned high-level models, there can be multiple realistic implementation strategies to take advantage of eager execution. For example, pipelining can be applied at an instruction granularity known as instruction pipeline~\cite{}. It can be also used at an algorithm granularity such as video processing pipeline~\cite{}. In this subsection, we define three major dimensions of the design space for the selected four models: 1) granularity, 2) communication, and 3) synchronization. 
+
+
+
+% \noindent{\bf Synchronization: } Once eager execution is enabled and consumer functions start their executions earlier (than the case with the traditional execution model), multiple functions (both producers and consumers) can run concurrently. Synchronizations are needed to guarantee necessary dependencies among concurrent function executions. There are two common approaches to provide synchronizations: blocking and non-blocking. In the blocking scenario, the producer halts its execution and waits for the confirmation signals from the consumer(s). A consumer sends confirmation signals to its producers(s) before it starts execution. While blocking is simple and effective in ``point-to-point'' synchronization, it does not scale well. To be more specific, in the case of multiple producers and multiple consumers and each pair requires synchronization, the overheads significantly increase, and this  can offset the benefits obtained from eager execution. In our framework, we choose to use ``non-blocking'' to avoid aforementioned issues as it allows better concurrent execution of producers and consumers.
+
+
+% \begin{table}[h]
+% % \vspace{-0.2cm}
+% 	\scriptsize
+%     \centering
+% 	\begin{tabular}{|c||c|c|}
+%     \hline
+%     & Output is precise & Output is approximate\\
+%     \hline\hline
+%     One version & eager evaluation~\cite{} &\\ 
+%     consumed &continuation function~\cite{} &value prediction~\cite{}\\
+%     &software pipelining~\cite{}&Approximate computing~\cite{}\\\hline
+%     Multiple versions & runahead execution~\cite{} & \\
+%     consumed & speculative execution~\cite{}&anytime automation~\cite{}\\
+%     &branch prediction~\cite{}&\\\hline
+% 	\end{tabular}
+%     \caption {Classifications of techniques of eager execution based on the behaviors of consumer compute blocks.} \label{tab:category}
+% \end{table} 
+
+% \subsection{Consumer-centric Categorization of Eagerness Approaches}
+% In Table~\ref{tab:category}, we introduce a simple, consumer-driven taxonomy to group previous approaches by how the decision to consume an input is allowed to affect the two dimensions of output quality and total computational effort. From each of the four sets in this taxonomy, we then select a single usage paradigm as a target for a case study. For instance, a consumer can evaluate repeatedly on multiple versions of data, which would entail that, on the producer side, in order to generate multiple versions of data, the producer needs to be able to produce intermediate values of data as versions. Therefore, depending on the inputs (i.e., versions of data) of consumers and the outputs (i.e., approximation or non-approximation) of consumers, the aforementioned techniques can be classified into four categories as shown in Table~\ref{tab:category}. 
+
+% In this classification, the horizontal dimension represents whether the consumer's output is approximated or not. Specifically, we consider a consumer's output approximated if 1) it uses the intermediate versions of data (which is not final version) generated by producers, and 2) the consumer's output differs from the output of using the final version of data.  In contrast, a consumer's output is considered non-approximated if it is identical to the output produced using the final version of data (even if it consumes intermediate versions of data). The vertical dimension in the table represents the properties of inputs to the consumer. Specifically, the consumer can take either 1)  one particular version of data, or 2) multiple intermediate versions as input. In the former, the producer stops its execution when all of its consumers start execution using their required specific versions of data, whereas in the latter, the producer continues to completion as the its consumers require multiple versions of data. 
+ 
+% Stopping a producer reduces the amount of redundant work it needs to perform to generate more versions of data and relinquishes its occupied compute resources to be used by other waiting jobs, as doing so can potentially improve overall application performance. However, it might happen that the consumer requires more accurate data from the producer. This can happen, for example, when the consumer's output is not satisfactory. As a result, if the producer is terminated after the consumer starts, the producer has to restart its execution to provide the consumer with more accurate data, and the consumer has to wait for the data. This restarting process clearly introduces overheads that can offset the benefits obtained from eager execution of consumers. Therefore, it would be beneficial for the producers to continue execution even after all of its consumers start their executions. In this scenario, whenever a consumer needs more versions of data, the producer would have already made progress which would shorten the wait time for the consumer. 
+
+% It is possible that the consumer output is non-approximated even if it takes intermediate version of data. Let us consider an example in which the producer produced a summation of a sequence of non-negative data and the consumer compares the summation result against a constant value to see whether the summation is greater than the constant. Since the intermediate version of the summation results are monotonously increasing, the consumer can safely produce the identical output using an intermediate version of summation result as long as it is greater than the constant (although the intermediate version would not be identical to the final version). Combining the input and output properties and consumers, we envision four distinct categories of eager execution summarized in Table~\ref{tab:category}. 
+
+% \ignore{
+% \noindent{\bf Category 1: }Consumer takes one version of the input data and the output is non-approximated. For example, Coroutines~\cite{xxx} in functional programming languages employ the concept of "continuation". This allows the execution switch between non-preemptive subroutines. Thus, the consumer starts earlier using the  final version of data from the coroutines.
+
+% \noindent{\bf Category 2: }Consumer takes multiple versions of the input data and the output is non-approximated. An example in this category is branch prediction in modern out-of-order processors~\cite{}. The execution of instruction sequence (consumers) takes two ``inputs'', one is the predicted branch and one is the real branch. To be more specific, when the program execution encounters a control divergence,  the instruction pipeline continues to issue instructions based on the results or branch predictor. However, those pre-executed instructions are not allowed to change machine state (e.g., memory contents). If the prediction turns out to be correct, the pre-executed instructions are committed without re-execution. On the other hand, if the prediction turns out to be wrong, the results are omitted and the correct sequence of instructions are executed.
+
+% %Specifically, the instruction window size in processors cannot effectively hide the long latencies caused by memory instructions. Runahead execution allows instructions fall out of the instruction window to start execution but does not allow them to change the machine state (e.g., writing into memory). When these pre-executed instructions come into the slide instruction window, they are committed without re-execution. If there exist a branch divergence, the pre-executed instructions are abandoned as they did not change the machine state. 
+
+% \noindent{\bf Category 3: }Consumer takes one version of the input data and the output is approximated. A majority of prior research works on approximation computing falls into this category~\cite{xxx}. For example, based on the value locality and value similarity, Wong et al.~\cite{approxwarp} propose warp approximation in GPUs, which leverages intra-warp operand value similarity and performs load instructions for only a subset of the threads in a warp. The load instruction of other warps are skipped and the value from the neighboring threads are used as the load value.  
+
+% \noindent{\bf Category 4: }Consumer takes multiple versions of the input data and the output is approximated. The difference between this category and category 3 is that the consumer takes multiple versions of inputs. This property requires on the producer side the capability to provide multiple versions of data and leads to the question of when to stop the producer. While this decision generally depends on the application semantics, a basic strategy is to decide the termination of producer based on whether the consumer needs incremental inputs over time. Anytime automation~\cite{} based on anytime algorithms, which is a computation model that has the property of producing intermediate inputs with increasing accuracy over time, falls into this category. Specifically, in a function call graph, the producer function generates outputs over time and the consumer function evaluate each version of producer's outputs. It is guaranteed that application output is provided with increasing accuracy and the final application specific criteria is eventually reached.
+% }
+% %Mahmut: I am not sure whether the pargraph below reads well. Try to rephrase it and clearly say what you mean
+% %xulong: I commented out this paragraph.
+% %Note that most of the techniques from different categories are either orthogonal or complementary to each other, and the possible combinations of techniques leads to a huge optimization space to achieve realistic eager execution. While one can exhaustively explore all the possible combinations of every technique, it is impossible to provide uniform interfaces which integrates all the optimization techniques.
+
+% In this paper, we focus on four basic models which cover all aforementioned four categories. Specifically, we target 1) pipelining, 2) speculative execution, 3) approximation with single version of input, and 4) approximation with multiple versions of input. 
+
+% \noindent{\bf Pipelining: }We choose pipelining as a representative of eager consumer execution which consumer takes one version of the input data and the output is precise. The opportunity of realizing pipelining is straightforward. For instance, let us consider the reader-writer model. In this model, a writer write data into a shared queue and multiple readers read the contents of that queue. One strategy is that all the readers are blocked and wait on the writer to finish all its writing before they could consume the contents in the queue. In contrast, a pipelining strategy starts readers earlier while the writer is executing. Note that consistency needs to be maintained between writer and readers. In general, pipelining realizes eager execution by initiating the dependent compute block (consumer) using  already-produced final versions of data while the producer is  continuing with producing final versions of "other data". We want to emphasize that, in pipelining, the produced data is already the final version for the consumer to use without any approximation. In other words, the producer ``partitions'' the output data into slices and each slice of the data is at its final version for consumer to use. The producer keeps producing the final versions of the different slices of data while the consumer keeps working on the already-produced slices of data. At high level, one can think slice as the ``spatial'' attribute of data and version as the ``temporal'' attribute of data.
+
+% \noindent{\bf Speculative execution: } In speculative execution, consumer takes multiple versions of the input data and the output is guaranteed to be precise. Unlike pipelining, the consumer consumes intermediate versions of data (speculative data) in speculation, instead of the final version of data. The producer keeps producing intermediate versions of the same data and the consumer operates on all of the versions one by one. Note that the final version of data is also produced to validate the correctness of speculative execution. Performance gains are achieved when the output of the consumer is satisfied and the final output is reached when using an intermediate data from the producer. 
+
+% \noindent{\bf Approximation with single version of input: }In this model, a consumer takes one version of the input data and the output is approximated. The producer stops its execution when all of its consumers start. Since the producer stops its execution, it relinquishes the occupied resources and allows other computations that are waiting on free resources to start execution, and as a result, the overall application performance improves. However, it may happen that the final output criteria is not satisfied due to the inaccuracy of the intermediate data the consumer operates. In that case, the application needs to re-execute and a more accurate version of data is provided to the consumer. 
+
+% \noindent{\bf Approximation with multiple versions of input: } In this model, the producer continues to completion even when all of its consumers start with the intermediate versions of data. Although this model may not be as beneficial as the previous one due to the fact that the producer occupies resources till completion and some versions of the data produced may never be used by the consumer, it can benefit performance since when the consumers need more accurate data, the application does not need to be re-executed and the consumers do not need to wait long, as the producer continues to make progress to its completion.  
+
+% %%%%%
+
+% \subsection{Potential Benefits}
+% In this section, we use the code snippet discussed previously to show the potential benefits of eager execution in all of the four models we target in our framework. For explanation purpose, let us assume that all the functions operate on arrays and output arrays (i.e., $f$, $g$ and $p$ are array type). Fig.~\ref{figs:parallel} depicts the parallel execution of the code snippet from Fig.~\ref{figs:code}. Recall that, in Fig.~\ref{figs:code}, function {\tt P(f,g)} depends on the outputs of functions {\tt F()} and {\tt G()}. Therefore, function {\tt P(f,g)} can only start its execution (at time $t_2$) using final versions of $f$ and $g$ after both functions {\tt F()} and {\tt G()} are finished. 
+
+% \begin{figure}
+% \centering
+% \subfloat[Parallel execution.]{\includegraphics[scale=0.4]{figs/parallel}\label{figs:parallel}}\\
+% \subfloat[Pipelining.]{\includegraphics[scale=0.4]{figs/pipeline}\label{figs:pipeline}}\\
+% \subfloat[Speculative execution.]{\includegraphics[scale=0.4]{figs/speculative}\label{figs:speculative}}\\
+% \subfloat[Approximation with multiple versions of input data]{\includegraphics[scale=0.4]{figs/continue}\label{figs:continue}}\\
+% \subfloat[Approximation with single version of input data]{\includegraphics[scale=0.4]{figs/stop}\label{figs:stop}}
+% \caption{Potential benefits by realizing eager execution.}
+% \label{example_figs}
+% \end{figure}
+
+% Fig.~\ref{figs:pipeline} shows the pipelining model.   Unlink the original parallel execution, the array data $f$ is divided into $n$ slices, each slices is denoted as $f^{(i)}$ where $1 \le i \le n$. The consumer function {\tt P(f,g)} takes a slice of data ($f^{(i)}$ and $g^{(i)}$) as inputs and produce a slice of output ($p^{(i)}$). A consumer function, {\tt P($f^{(i)}$, $g^{(i)}$)}, can execute concurrently with producer functions, $f^{(j)}={\tt F()}$, $g^{(k)}={\tt G()}$, if $j < i$ and $k < i$. 
+% It should be emphasized each slice of the data is at its final version without intermediate versions in pipelining model.  
+
+% We show the speculative execution model in Fig.~\ref{figs:speculative}. We denote the version of data using  $f_{i}$ ($1 \le i \le n$). In  Fig.~\ref{figs:speculative}, both producers {\tt F()} and {\tt G()} start execution at $t_0$. At $t_1$, the consumer function takes intermediate versions of data ($f_1$ and $g_1$) and produces an output of $p_1$. At $t_2$, the consumer function takes another intermediate version of data ($f_2$ and $g_2$) and produces $p_2$. In speculative execution model, it is guaranteed that the final version of data ($f_n$ and $g_n$) are consumed by consumer at $t_3$, and the final output $p_n$ is generated.
+
+% Fig.~\ref{figs:continue} shows the model of approximation with multiple versions as inputs to the consumer function. It is similar compared to the speculative execution model and the only key difference is that it does not require the final version of data to be consumed by the consumer function. To be more specific, the last consumer function starts at $t_3$ without waiting on producer {\tt G()} which finishes at $t_4$. The last consumed data are ($f_m$ and $g_m$)  where $ m < n$, and $p_m$ is the approximated output. 
+
+% Finally, we show the approximation with single version of data in Fig.~\ref{figs:stop}. In this model, both the producers start execution at $t_0$ and terminate at $t_1$, where they each generates one version of data and the consumer  starts. 
+
+
+
+
+
+
+
+
+
+
+
+% \ignore{
+% \begin{figure}
+% \centerline
+% {
+% \subfloat[Code Example]{\includegraphics[scale=0.55]{figs/code}\label{figs:code}}
+% }
+% \vfil
+% \centerline
+% {
+% \subfloat[Sequential Execution.]{\includegraphics[scale=0.55]{figs/mot1}\label{figs:mot1}}
+% }
+% \vfil
+% \centerline
+% {
+% \subfloat[Parallel]{\includegraphics[scale=0.55]{figs/mot2}\label{figs:mot2}}
+% }
+% \vfil
+% \centerline{
+% \subfloat[Fluid]{\includegraphics[scale=0.55]{figs/mot3}\label{figs:mot4}}
+% }
+% \caption{Examples showing different models.}
+% \label{example_figs}
+% \vspace{-0.1in}
+% \end{figure}
+
+% \section{Motivation}
+% \label{sec:motivation}
+% \subsection{Call Graph and Data Dependency}
+% \label{sec:mot:models}
+
+% ~\label{sec:fluidexection}
+% In this paper, we focus on computing kernels which can be organized as a sequence of dependent function calls. Such representation is a concise way to express the data flow (data dependencies) across function calls and is naturally used in modern applications such as image processing pipelining~\cite{xxx}, object classification~\cite{xxx}, and high-performance computing application programs~\cite{xxx}. Considering an abstract example of interdependent function call graph shown in Fig.~\ref{example_figs}, 
+% %We expand the data-flow graph over time to investigate the varying values of all variables associated to their function calls, to see if we can further relax the starting points of a function call. Hence, we mainly focus on the value change of inputs and outputs of function calls. We plotted the value change at the bottom of each figures in Fig~\ref{example_figs}. 
+% in this example, we are interested in four memory locations~\footnote{We assume the values of these memory locations are not valid initially till its first update, and are not relevant to our discussion.}, namely, {\em f}, {\em g}, {\em p} and {\em q}. These memory locations convey the values of each function call's outputs (can potentially be other function calls' inputs), e.g., memory location {\em f} is the output of function \texttt{F()}, and is being updated during the execution of \texttt{F()}. Note that, {\em f} is also the memory location where function \texttt{P()} finds its input.
+
+% Lets focus on memory location {\em f} and its value varying. There are several important stamps (denoted as $\textbf{T}_\textit{x}$) in {\em f}'s value change (denoted as $\textbf{f}_\textit{x}$) and we now discuss them in detail:
+
+% $\textbf{T}_{0}$@$\textbf{f}_{0}$: F() starts its execution at $\textbf{T}_{0}$, however, F() will only update on {\em f} a while later. $\textbf{f}_{0}$ is not available for use at this moment.
+
+% $\textbf{T}_{1}$@$\textbf{f}_{1}$: $\textbf{f}_{1}$ is the first update to {\em f}, that is, the first write from function F(). 
+
+% $\textbf{T}_{2}$@$\textbf{f}_{2}$: $\textbf{f}_{2}$ reaches 90\% of its final value ($\textbf{f}_{3}$).
+
+% $\textbf{T}_{3}$@$\textbf{f}_{3}$: The value of $\textbf{f}_{3}$ is as same as its final value of $\textbf{f}_{4}$.
+
+% $\textbf{T}_{4}$@$\textbf{f}_{4}$: $\textbf{f}_{4}$ is the last update to {\em f}, and its value is then fixed. 
+
+% $\textbf{T}_{5}$@$\textbf{f}_{5}$: F() reaches its \texttt{return} and stops at $\textbf{T}_{5}$. $\textbf{f}_{5}$ has the same value of $\textbf{f}_{4}$.
+
+% Note that, to accord the program order, neither P or Q can start before T5, even though their dependent input \texttt{f} is already fixed its value at T4. If we could schedule P and Q to start their execution to an earlier point (e.g. T4), the overall execution time can be further shortened. 
+
+% In fact, \textit{the function call can start as long as it accepts a version of the value of its inputs}. To address the \textit{acceptable} version, we classify the following versions for a function call:
+
+% \noindent\textbf{Version A: Final Value} This is represented by T4. The version is no different from the final value. By consuming this version as inputs, the consumer function call's execution is no difference than the previous data-flow model. It can start its processing earlier upto the point of time of this version, without losing any accuracy. Examples in real world scenarios are: xxx1, xxx2, xxx3. 
+
+% \noindent\textbf{Version B: Similar Value} This is represented by T3. The version of the value is very close (but not same) to its final value. The consumer function call can accept this version of input value, as long as it won't result in any difference at the output. Real world scenarios are: Monte-Carlo, Newton's Method, etc.
+
+% \noindent\textbf{Version C: Passable Value} This is represented by T2. This version of value is not close to its final value, but probably is sufficient enough for the consumer function call to produce acceptable results. Candidates consumers can take this version, as long as the output is within a satisfied range. This model is more aggressive than the previous two, but offers further performance benefit. Examples are JPEG, xxx, xxx, etc.
+
+% \textbf{XXX here how do we transit to the language support section ?? XXX}
+
+% To exploit the value dependency and these intermediate values,
+% }
+% %=====================================================================
+% %=====================================================================
+% %=====================================================================
+

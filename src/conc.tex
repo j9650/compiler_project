@@ -1,0 +1,14 @@
+%%%%%
+
+\section{Conclusions}
+\label{sec:conc}
+This paper introduces Fluid computation, a new approach to eager computation based on a novel concept called a Fluid Variable. A Fluid variable differs from ordinary variables in that its consumers can start operating on it before its producers have completed their updates to it. This allows, in principle, producers and consumers of a Fluid variable to execute in parallel while sharing the partially-computed value of the Fluid variable. This paper presents the language extensions needed to support Fluid computations, automated compiler support to translate a program augmented with Fluid variables into a conventional C++ code consumable by any C++ compiler, and an accompanying runtime system that controls when consumer tasks can start their executions and how multiple copies of Fluid variables are created and maintained during the course of execution. Our experimental results with four applications across varying inputs demonstrate that Fluid computation can be an effective way of harnessing the benefits of approximate computing without significantly compromising the output quality of a program. 
+
+%We tested the effectiveness of our proposed Fluid computation using four application programs that can benefit from eager execution facilitated by various types of Fluid variables. We explain in detail how we fluidize these programs and how doing so enables overlapped execution of producer and consumer functions. 
+
+%We believe that this initial work on Fluid computation opens up at least three interesting research avenues, which we are planning to pursue as our future work. First, our current implementation of Fluid computation is entirely software based. It would be interesting to explore hardware support for faster evaluation of valve functions and guards as well as faster synchronization of producer and consumer functions. Second, we plan to investigate the impact of the Fluid variable concept on the type system of the underlying language. Since Fluid variables can be operated on in their transitional state, their interaction with ordinary class variables, e.g., pointer assignment between a Fluid variable and an ordinary variable, can bring up novel challenges from the type system angle. Finally, while our evaluation of Fluid computation in  this paper is oriented towards enabling approximate computations, we believe that the Fluid computation concept can also expedite the execution of (non-approximate) speculative and pipelined computations.
+
+%%%%%
+
+
+%%%%%

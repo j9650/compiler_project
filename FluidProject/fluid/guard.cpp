@@ -62,6 +62,12 @@ void _runTask(Guard* g, GuardTask* t) {
 	//SyncLogger::print("after run, name: ", g->name, "\n");
 	//123//if (t->guard) g->putSignal(t->guard, "Completed");
 
+	// end valve, update the version of each output
+	// At end of R: this->version++
+	for (Data *input_data : g->task->output) {
+		input_data->set_version(input_data->version() + 1);
+	}
+
 	//if (t->guard) {g->putSignal(t->guard, "Completed"); /*std::cout << "after run, name: " << g->name << std::endl;*/}
 	if (t->guard) {g->putSignal(t->guard, "Endcheck"); } // the state goes to Endcheck after each time excution finished
 }
@@ -88,7 +94,7 @@ void Guard::runGuardWorkingThread_() {
 				cv.wait(lk);
 				;;
 			}
-		} else{
+		} else {
 			std::unique_lock<std::mutex> lk(mtx);
 			while (sq->empty()) {
 				cv.wait(lk);
@@ -105,9 +111,7 @@ void Guard::runGuardWorkingThread_() {
 				SyncLogger::print("EXEC spec GUARDFINSHED@@@@@@@@", name, "Wall: ", (GuardTimerWT).stop(), "CPU:", (GuardTimerCT).stop());
 				return;
 			}
-		}
-		
-		else {
+		} else {
 			gstate->handle(this, signal);
 
 			//no lock is here

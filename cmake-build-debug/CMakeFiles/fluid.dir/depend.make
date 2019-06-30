@@ -11,6 +11,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.o: ../FluidProject
 CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.o: ../FluidProject/apps/bellman_ford_fluid.cpp
 CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.o: ../FluidProject/apps/bellman_ford_fluid.h
 CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.o: ../FluidProject/apps/kmeans.h
+CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.o: ../FluidProject/fluid/data.h
 CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.o: ../FluidProject/fluid/fluid.h
 CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.o: ../FluidProject/fluid/guard.h
 CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.o: ../FluidProject/fluid/guardscheduler.h
@@ -39,6 +40,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o: ../FluidProject/apps/s
 CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o: ../FluidProject/apps/sssp.h
 CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o: ../FluidProject/apps/sssp_fluid.h
 CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o: ../FluidProject/apps/test_out.h
+CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o: ../FluidProject/fluid/data.h
 CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o: ../FluidProject/fluid/fluid.h
 CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o: ../FluidProject/fluid/guard.h
 CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o: ../FluidProject/fluid/guardscheduler.h
@@ -62,6 +64,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.o: ../FluidProject/a
 CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.o: ../FluidProject/apps/graphcolor_fluid.cpp
 CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.o: ../FluidProject/apps/graphcolor_fluid.h
 CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.o: ../FluidProject/apps/kmeans.h
+CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.o: ../FluidProject/fluid/data.h
 CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.o: ../FluidProject/fluid/fluid.h
 CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.o: ../FluidProject/fluid/guard.h
 CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.o: ../FluidProject/fluid/guardscheduler.h
@@ -83,6 +86,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/kmeans.cpp.o: ../FluidProject/utils/logge
 CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o: ../FluidProject/apps/kmeans.h
 CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o: ../FluidProject/apps/kmeans_fluid.cpp
 CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o: ../FluidProject/apps/kmeans_fluid.h
+CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o: ../FluidProject/fluid/data.h
 CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o: ../FluidProject/fluid/fluid.h
 CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o: ../FluidProject/fluid/guard.h
 CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o: ../FluidProject/fluid/guardscheduler.h
@@ -108,6 +112,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.o: ../FluidProject/apps/k
 CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.o: ../FluidProject/apps/sobel.h
 CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.o: ../FluidProject/apps/sobel_fluid.cpp
 CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.o: ../FluidProject/apps/sobel_fluid.h
+CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.o: ../FluidProject/fluid/data.h
 CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.o: ../FluidProject/fluid/fluid.h
 CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.o: ../FluidProject/fluid/guard.h
 CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.o: ../FluidProject/fluid/guardscheduler.h
@@ -128,6 +133,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o: ../FluidProject/apps/km
 CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o: ../FluidProject/apps/sssp.h
 CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o: ../FluidProject/apps/sssp_fluid.cpp
 CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o: ../FluidProject/apps/sssp_fluid.h
+CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o: ../FluidProject/fluid/data.h
 CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o: ../FluidProject/fluid/fluid.h
 CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o: ../FluidProject/fluid/guard.h
 CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o: ../FluidProject/fluid/guardscheduler.h
@@ -144,6 +150,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o: ../FluidProject/utils/t
 CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o: ../FluidProject/apps/kmeans.h
 CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o: ../FluidProject/apps/test_out.cpp
 CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o: ../FluidProject/apps/test_out.h
+CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o: ../FluidProject/fluid/data.h
 CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o: ../FluidProject/fluid/fluid.h
 CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o: ../FluidProject/fluid/guard.h
 CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o: ../FluidProject/fluid/guardscheduler.h
@@ -157,7 +164,10 @@ CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o: ../FluidProject/utils/log
 CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o: ../FluidProject/utils/profiler.h
 CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o: ../FluidProject/utils/timer.h
 
+CMakeFiles/fluid.dir/FluidProject/fluid/data.cpp.o: ../FluidProject/fluid/data.cpp
+
 CMakeFiles/fluid.dir/FluidProject/fluid/guard.cpp.o: ../FluidProject/apps/kmeans.h
+CMakeFiles/fluid.dir/FluidProject/fluid/guard.cpp.o: ../FluidProject/fluid/data.h
 CMakeFiles/fluid.dir/FluidProject/fluid/guard.cpp.o: ../FluidProject/fluid/fluid.h
 CMakeFiles/fluid.dir/FluidProject/fluid/guard.cpp.o: ../FluidProject/fluid/guard.cpp
 CMakeFiles/fluid.dir/FluidProject/fluid/guard.cpp.o: ../FluidProject/fluid/guard.h
@@ -173,6 +183,7 @@ CMakeFiles/fluid.dir/FluidProject/fluid/guard.cpp.o: ../FluidProject/utils/profi
 CMakeFiles/fluid.dir/FluidProject/fluid/guard.cpp.o: ../FluidProject/utils/timer.h
 
 CMakeFiles/fluid.dir/FluidProject/fluid/guardscheduler.cpp.o: ../FluidProject/apps/kmeans.h
+CMakeFiles/fluid.dir/FluidProject/fluid/guardscheduler.cpp.o: ../FluidProject/fluid/data.h
 CMakeFiles/fluid.dir/FluidProject/fluid/guardscheduler.cpp.o: ../FluidProject/fluid/fluid.h
 CMakeFiles/fluid.dir/FluidProject/fluid/guardscheduler.cpp.o: ../FluidProject/fluid/guard.h
 CMakeFiles/fluid.dir/FluidProject/fluid/guardscheduler.cpp.o: ../FluidProject/fluid/guardscheduler.cpp
@@ -188,6 +199,7 @@ CMakeFiles/fluid.dir/FluidProject/fluid/guardscheduler.cpp.o: ../FluidProject/ut
 CMakeFiles/fluid.dir/FluidProject/fluid/guardscheduler.cpp.o: ../FluidProject/utils/timer.h
 
 CMakeFiles/fluid.dir/FluidProject/fluid/guardstates.cpp.o: ../FluidProject/apps/kmeans.h
+CMakeFiles/fluid.dir/FluidProject/fluid/guardstates.cpp.o: ../FluidProject/fluid/data.h
 CMakeFiles/fluid.dir/FluidProject/fluid/guardstates.cpp.o: ../FluidProject/fluid/fluid.h
 CMakeFiles/fluid.dir/FluidProject/fluid/guardstates.cpp.o: ../FluidProject/fluid/guard.h
 CMakeFiles/fluid.dir/FluidProject/fluid/guardstates.cpp.o: ../FluidProject/fluid/guardscheduler.h
@@ -203,6 +215,7 @@ CMakeFiles/fluid.dir/FluidProject/fluid/guardstates.cpp.o: ../FluidProject/utils
 CMakeFiles/fluid.dir/FluidProject/fluid/guardstates.cpp.o: ../FluidProject/utils/timer.h
 
 CMakeFiles/fluid.dir/FluidProject/fluid/tasklet.cpp.o: ../FluidProject/apps/kmeans.h
+CMakeFiles/fluid.dir/FluidProject/fluid/tasklet.cpp.o: ../FluidProject/fluid/data.h
 CMakeFiles/fluid.dir/FluidProject/fluid/tasklet.cpp.o: ../FluidProject/fluid/fluid.h
 CMakeFiles/fluid.dir/FluidProject/fluid/tasklet.cpp.o: ../FluidProject/fluid/guard.h
 CMakeFiles/fluid.dir/FluidProject/fluid/tasklet.cpp.o: ../FluidProject/fluid/guardscheduler.h
@@ -231,6 +244,7 @@ CMakeFiles/fluid.dir/FluidProject/main.cpp.o: ../FluidProject/./apps/sobel_fluid
 CMakeFiles/fluid.dir/FluidProject/main.cpp.o: ../FluidProject/./apps/sssp.h
 CMakeFiles/fluid.dir/FluidProject/main.cpp.o: ../FluidProject/./apps/sssp_fluid.h
 CMakeFiles/fluid.dir/FluidProject/main.cpp.o: ../FluidProject/./apps/test_out.h
+CMakeFiles/fluid.dir/FluidProject/main.cpp.o: ../FluidProject/./fluid/data.h
 CMakeFiles/fluid.dir/FluidProject/main.cpp.o: ../FluidProject/./fluid/fluid.h
 CMakeFiles/fluid.dir/FluidProject/main.cpp.o: ../FluidProject/./fluid/guard.h
 CMakeFiles/fluid.dir/FluidProject/main.cpp.o: ../FluidProject/./fluid/guardscheduler.h

@@ -1,0 +1,33 @@
+%%%%%
+
+\section{Related Work}
+\label{sec:related}
+In this section, we summarize previous efforts and discuss them in four categories: 
+approximate computing, eager execution, concurrent OOP, and continuations/coroutines.
+
+
+%In this section, we will discuss previous works regarding approximate computing, speculation, \todo{etc}.
+
+\noindent{\bf Approximate computing:~} There have been recent prior efforts focusing on approximate computing~\cite{Baek:2010:GFS:1806596.1806620,Ringenburg:2015:MDQ:2694344.2694365,Ribic:2014:EWL:2541940.2541971,Schkufza:2014:SOF:2594291.2594302,Samadi:2014:PPA:2541940.2541948,Gupta:2014:GPE:2594291.2594306,Goiri:2015:ABA:2694344.2694351,Miguel:2014:LVA:2742155.2742169,Gehr:2018:BPI:3192366.3192400,Laurenzano:2016:IRU:2908080.2908087} that target applications for which one may accept less-than-exact output. The prior works in this category can be divided into software, architecture, and circuit levels. At the software level, Sidiroglou et al.~\cite{Sidiroglou11} proposed an approach that uses loop perforation to reduce the amount of computations to be performed by skipping select loop iterations. Bornholt et al.~\cite{Bornholt14} suggest an ``Uncertain'' type as an abstraction for exposing uncertain data and leverage runtime sampling and hypothesis tests to evaluate computation and conditionals. Their uncertain type improves expressiveness and accuracy of approximate applications. 
+Sampson et al.~\cite{Sampson:2014:EVP:2594291.2594294} proposed probabilistic assertions where the programmer can express probabilistic correctness properties. They also described an evaluation approach to efficiently verify the assertions. 
+At the architecture level, Venkataramani et al.~\cite{Venkataramani-MICRO-13} proposed a programmable vector processor architecture, QUORA, that balances energy consumption and quality. Inspired by neural networks, Esmaeilzadeh et al.~\cite{Esmaeilzadeh12} proposed and evaluated a novel architecture that augments a traditional processor with a neural processing unit (NPU). At the circuit level, Kulkarni et al.~\cite{Kulkarni11} designed a power efficient 2 $\times$ 2 approximate multiplier and Venkataramani et al.~\cite{Venkataramani-DATE-13} proposed Substitute-And-SIMplIfy (SASIMI) for approximate circuits. SASIMI identifies signal pairs in the circuit and substitutes one for the other if they have the same value with high probability.
+
+
+%\noindent{\bf Speculation:}
+%Speculation is a technique to predict the value of particular instruction. It speculates the result of computations~\cite{Gonzalez98},\cite{Fu98},\cite{Perais14} to improve performance.
+%Eager execution is one way to speculate, which runs both side of conditional branch and commit only one side.
+
+\noindent{\bf Eager execution:~} Work on starting a consumer earlier (i.e., eager execution) saw substantial activity throughout the 1990s with various approaches proposed for predication and speculative execution~\cite{Yeh92,Pan92,Jimenez02,Chrysos98,Moshovos99,Subramaniam06}. Uht et al.~\cite{Uht95} proposed disjoint eager execution (DEE) which yields more parallelism than branch prediction and predication under the same resource constrains. Klauser et al.~\cite{Klauser98} proposed selective eager execution (SEE) which overcomes mis-speculation penalties by executing both paths after diffident branches.
+August et al.~\cite{August:1998:IPS:279358.279391} proposed explicitly parallel instruction computing (EPIC), which uses an optimizing compiler to perform control speculation, data dependence speculation, and predication. Paszke et al.~\cite{paszke2017automatic} employed eager execution in deep learning frameworks, and Lim et al.~\cite{Lim:2014:LEA:2667473.2667476} evaluated both eager and lazy solutions for the set cover problem. 
+
+\noindent{\bf Concurrent object-oriented programming: } Prior works have explored concurrent object-oriented programming (COOP), which combines object-oriented programming with concurrency~\cite{DBLP:journals/corr/GanesanJMMAW16,Charousset:2013:NAS:2541329.2541336,Charousset:2016:RAP:2956216.2956327}. Agha~\cite{Agha:1990:COP:83880.84528} discussed the foundations and methodology of COOP. The author employed the actor model as a framework for concurrent systems and describes techniques for supporting reusability and modularity in COOP. In the actor model, each actor is a concurrent computation entity that can send/receive messages as well as create new actors. Languages using actor model includes Cantor~\cite{Athas:1988:CAP:67386.67402},  Pony~\cite{Clebsch:2015:DCS:2824815.2824816}, and P~\cite{Desai:2013:PSA:2491956.2462184}.  Lee et al.~\cite{Lee:1991:OOP:125826.105186} presented an object-oriented parallel programming paradigm where programmers can describe attributes of distribution (e.g., data distribution across processors) to build distributed structures.
+
+\noindent{\bf Continuations/coroutines:~} Several compilers for higher-order programming languages use continuation passing style (CPS) terms as their intermediate representation for programs~\cite{appel2007compiling}.  All procedures in CPS take a \emph{continuation} that represents the rest of computation. Continuation is conceptually a special case of Fluid computation, where the rest of computation starts when the current procedure is \emph{fully} evaluated. The coroutine is a useful language abstraction for describing a consumer-producer relationship, where the producer may ``yield'' to the consumer whenever new items are created. In the simplest case, the producer may yield whenever a new version of data is available. But, in general, coroutines lack flexibility compared with our work, since it is difficult to (1) describe nontrivial trigger conditions and validation conditions, and (2) support many-to-many relations between consumers and producers.
+
+\noindent{\bf How Do We Differ?~} Compared to all these prior works that focused either on particular application domains or on the realization of approximation in select system layers (e.g., programming language, compiler, runtime or architecture), our proposed Fluid framework is more general, and represents, to the best of our knowledge, the first systematic approach that targets eager execution opportunities in any application template employing a producer-consumer execution pattern. Further, by integrating compiler support with sophisticated runtime management, our Fluid framework is able to improve application performance without significantly compromising accuracy (output quality).
+
+%%%%%
+
+
+%\noindent{\bf Compiler and OS support:} continuations:
+%\noindent{\bf Architecture support:}

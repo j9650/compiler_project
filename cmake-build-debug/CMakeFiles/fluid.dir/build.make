@@ -122,9 +122,22 @@ CMakeFiles/fluid.dir/FluidProject/fluid/tasklet.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/fluid.dir/FluidProject/fluid/tasklet.cpp.s"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mdl/hzj5142/compiler_project/FluidProject/fluid/tasklet.cpp -o CMakeFiles/fluid.dir/FluidProject/fluid/tasklet.cpp.s
 
+CMakeFiles/fluid.dir/FluidProject/fluid/data.cpp.o: CMakeFiles/fluid.dir/flags.make
+CMakeFiles/fluid.dir/FluidProject/fluid/data.cpp.o: ../FluidProject/fluid/data.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/fluid.dir/FluidProject/fluid/data.cpp.o"
+	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/fluid/data.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/fluid/data.cpp
+
+CMakeFiles/fluid.dir/FluidProject/fluid/data.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/fluid.dir/FluidProject/fluid/data.cpp.i"
+	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mdl/hzj5142/compiler_project/FluidProject/fluid/data.cpp > CMakeFiles/fluid.dir/FluidProject/fluid/data.cpp.i
+
+CMakeFiles/fluid.dir/FluidProject/fluid/data.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/fluid.dir/FluidProject/fluid/data.cpp.s"
+	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mdl/hzj5142/compiler_project/FluidProject/fluid/data.cpp -o CMakeFiles/fluid.dir/FluidProject/fluid/data.cpp.s
+
 CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o: ../FluidProject/apps/experiments.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/apps/experiments.cpp
 
 CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.i: cmake_force
@@ -137,7 +150,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/apps/kmeans.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/apps/kmeans.cpp.o: ../FluidProject/apps/kmeans.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/kmeans.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/kmeans.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/apps/kmeans.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/apps/kmeans.cpp
 
 CMakeFiles/fluid.dir/FluidProject/apps/kmeans.cpp.i: cmake_force
@@ -150,7 +163,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/kmeans.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o: ../FluidProject/apps/kmeans_fluid.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/apps/kmeans_fluid.cpp
 
 CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.i: cmake_force
@@ -163,7 +176,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/apps/matrix.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/apps/matrix.cpp.o: ../FluidProject/apps/matrix.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/matrix.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/matrix.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/apps/matrix.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/apps/matrix.cpp
 
 CMakeFiles/fluid.dir/FluidProject/apps/matrix.cpp.i: cmake_force
@@ -176,7 +189,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/matrix.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford.cpp.o: ../FluidProject/apps/bellman_ford.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/apps/bellman_ford.cpp
 
 CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford.cpp.i: cmake_force
@@ -189,7 +202,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.o: ../FluidProject/apps/bellman_ford_fluid.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/apps/bellman_ford_fluid.cpp
 
 CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.i: cmake_force
@@ -202,7 +215,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/bellman_ford_fluid.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/apps/graphcolor.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/apps/graphcolor.cpp.o: ../FluidProject/apps/graphcolor.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/graphcolor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/graphcolor.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/apps/graphcolor.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/apps/graphcolor.cpp
 
 CMakeFiles/fluid.dir/FluidProject/apps/graphcolor.cpp.i: cmake_force
@@ -215,7 +228,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/graphcolor.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.o: ../FluidProject/apps/graphcolor_fluid.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/apps/graphcolor_fluid.cpp
 
 CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.i: cmake_force
@@ -228,7 +241,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/graphcolor_fluid.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/apps/sobel.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/apps/sobel.cpp.o: ../FluidProject/apps/sobel.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/sobel.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/sobel.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/apps/sobel.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/apps/sobel.cpp
 
 CMakeFiles/fluid.dir/FluidProject/apps/sobel.cpp.i: cmake_force
@@ -241,7 +254,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/sobel.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.o: ../FluidProject/apps/sobel_fluid.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/apps/sobel_fluid.cpp
 
 CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.i: cmake_force
@@ -254,7 +267,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/sobel_fluid.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o: ../FluidProject/apps/test_out.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/apps/test_out.cpp
 
 CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.i: cmake_force
@@ -267,7 +280,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/test_out.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/apps/sssp.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/apps/sssp.cpp.o: ../FluidProject/apps/sssp.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/sssp.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/sssp.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/apps/sssp.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/apps/sssp.cpp
 
 CMakeFiles/fluid.dir/FluidProject/apps/sssp.cpp.i: cmake_force
@@ -280,7 +293,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/sssp.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o: ../FluidProject/apps/sssp_fluid.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/apps/sssp_fluid.cpp
 
 CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.i: cmake_force
@@ -293,7 +306,7 @@ CMakeFiles/fluid.dir/FluidProject/apps/sssp_fluid.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/utils/logger.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/utils/logger.cpp.o: ../FluidProject/utils/logger.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/fluid.dir/FluidProject/utils/logger.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/fluid.dir/FluidProject/utils/logger.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/utils/logger.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/utils/logger.cpp
 
 CMakeFiles/fluid.dir/FluidProject/utils/logger.cpp.i: cmake_force
@@ -306,7 +319,7 @@ CMakeFiles/fluid.dir/FluidProject/utils/logger.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/utils/profiler.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/utils/profiler.cpp.o: ../FluidProject/utils/profiler.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/fluid.dir/FluidProject/utils/profiler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/fluid.dir/FluidProject/utils/profiler.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/utils/profiler.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/utils/profiler.cpp
 
 CMakeFiles/fluid.dir/FluidProject/utils/profiler.cpp.i: cmake_force
@@ -319,7 +332,7 @@ CMakeFiles/fluid.dir/FluidProject/utils/profiler.cpp.s: cmake_force
 
 CMakeFiles/fluid.dir/FluidProject/utils/timer.cpp.o: CMakeFiles/fluid.dir/flags.make
 CMakeFiles/fluid.dir/FluidProject/utils/timer.cpp.o: ../FluidProject/utils/timer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/fluid.dir/FluidProject/utils/timer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/fluid.dir/FluidProject/utils/timer.cpp.o"
 	/home/mdl/hzj5142/soft/install4/gcc-7.0.1/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluid.dir/FluidProject/utils/timer.cpp.o -c /home/mdl/hzj5142/compiler_project/FluidProject/utils/timer.cpp
 
 CMakeFiles/fluid.dir/FluidProject/utils/timer.cpp.i: cmake_force
@@ -337,6 +350,7 @@ fluid_OBJECTS = \
 "CMakeFiles/fluid.dir/FluidProject/fluid/guardscheduler.cpp.o" \
 "CMakeFiles/fluid.dir/FluidProject/fluid/guardstates.cpp.o" \
 "CMakeFiles/fluid.dir/FluidProject/fluid/tasklet.cpp.o" \
+"CMakeFiles/fluid.dir/FluidProject/fluid/data.cpp.o" \
 "CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o" \
 "CMakeFiles/fluid.dir/FluidProject/apps/kmeans.cpp.o" \
 "CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o" \
@@ -362,6 +376,7 @@ fluid: CMakeFiles/fluid.dir/FluidProject/fluid/guard.cpp.o
 fluid: CMakeFiles/fluid.dir/FluidProject/fluid/guardscheduler.cpp.o
 fluid: CMakeFiles/fluid.dir/FluidProject/fluid/guardstates.cpp.o
 fluid: CMakeFiles/fluid.dir/FluidProject/fluid/tasklet.cpp.o
+fluid: CMakeFiles/fluid.dir/FluidProject/fluid/data.cpp.o
 fluid: CMakeFiles/fluid.dir/FluidProject/apps/experiments.cpp.o
 fluid: CMakeFiles/fluid.dir/FluidProject/apps/kmeans.cpp.o
 fluid: CMakeFiles/fluid.dir/FluidProject/apps/kmeans_fluid.cpp.o
@@ -380,7 +395,7 @@ fluid: CMakeFiles/fluid.dir/FluidProject/utils/profiler.cpp.o
 fluid: CMakeFiles/fluid.dir/FluidProject/utils/timer.cpp.o
 fluid: CMakeFiles/fluid.dir/build.make
 fluid: CMakeFiles/fluid.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Linking CXX executable fluid"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/mdl/hzj5142/compiler_project/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Linking CXX executable fluid"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/fluid.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

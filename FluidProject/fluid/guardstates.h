@@ -12,22 +12,26 @@ class Guard;
 class GuardState {
 public:
 	virtual void handle(Guard* g, Signal sig) = 0;
+	virtual std::string get_statename() = 0;
 };
 
 
 class GuardStateExec1 : public GuardState {
 public:
 	virtual void handle(Guard* g, Signal sig) { assert(0); }
+	virtual std::string get_statename() { assert(0); }
 };
 
 class GuardStateExec2: public GuardStateExec1 {
 public:
 	virtual void handle(Guard* g, Signal sig) { assert(0); }
+	virtual std::string get_statename() { assert(0); }
 };
 
 class GuardStateExec3 : public GuardStateExec2 {
 public:
 	virtual void handle(Guard* g, Signal sig) { assert(0); }
+	virtual std::string get_statename() { assert(0); }
 };
 
 
@@ -65,6 +69,10 @@ public:
 		return statehandler;
 	}
 	void handle(Guard* g, Signal sig);
+	std::string get_statename() {
+		std::string statename_ = statename;
+		return statename_;
+	}
 };
 
 //Singleton...
@@ -83,6 +91,10 @@ public:
 		return statehandler;
 	}
 	void handle(Guard* g, Signal sig);
+	std::string get_statename() {
+		std::string statename_ = statename;
+		return statename_;
+	}
 };
 
 
@@ -102,6 +114,10 @@ public:
 		return statehandler;
 	}
 	void handle(Guard* g, Signal sig);
+	std::string get_statename() {
+		std::string statename_ = statename;
+		return statename_;
+	}
 };
 
 class GuardStateToCheck : public GuardStateExec1 {
@@ -120,6 +136,10 @@ public:
 	}
 
 	void handle(Guard* g, Signal sig);
+	std::string get_statename() {
+		std::string statename_ = statename;
+		return statename_;
+	}
 };
 
 class GuardStateToEndcheck : public GuardStateExec1 {
@@ -138,6 +158,10 @@ public:
 	}
 
 	void handle(Guard* g, Signal sig);
+	std::string get_statename() {
+		std::string statename_ = statename;
+		return statename_;
+	}
 };
 
 class GuardStateToPause : public GuardStateExec2 {
@@ -156,6 +180,10 @@ public:
 	}
 
 	void handle(Guard* g, Signal sig);
+	std::string get_statename() {
+		std::string statename_ = statename;
+		return statename_;
+	}
 
 };
 
@@ -175,6 +203,32 @@ public:
 	}
 
 	void handle(Guard* g, Signal sig);
+	std::string get_statename() {
+		std::string statename_ = statename;
+		return statename_;
+	}
+};
+
+class GuardStateToWait : public GuardStateExec1 {//GuardStateSingleton...
+public:
+	static GuardState * statehandler;
+	static std::string statename;
+	CPUTimer  cputimer;
+	WallTimer		walltimer;
+	static GuardState* Instance() {
+		//cputimer.start();
+		//walltimer.start();
+		if (statehandler == nullptr) {
+			statehandler = new GuardStateToTerminate();
+		}
+		return statehandler;
+	}
+
+	void handle(Guard* g, Signal sig);
+	std::string get_statename() {
+		std::string statename_ = statename;
+		return statename_;
+	}
 };
 
 class GuardStateToResume : public GuardStateExec3 {//GuardStateSingleton...
@@ -194,6 +248,10 @@ public:
 	}
 
 	void handle(Guard* g, Signal sig);
+	std::string get_statename() {
+		std::string statename_ = statename;
+		return statename_;
+	}
 };
 
 

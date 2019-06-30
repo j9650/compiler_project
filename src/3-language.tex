@@ -1,0 +1,163 @@
+\section{Language Support}
+\label{sec:fluid_lang}
+%We now present {\bf Fluid}, a set of programming language extensions to allow programmer easily port existing applications to eager execution model by annotating the conditions %and quality criteria in the program source code. 
+
+Realizing fluidity in an application is non-trivial and requires programming language, compiler and runtime support. This section focuses on language support.
+We define the syntax and semantics of language extensions in Section~\ref{ssec:formal}, and use a real-world application to illustrate it in Section~\ref{ssec:lan_examp}.
+%Specifically, we first define the syntax and semantics of language extensions for our proposed Fluid framework in Section~\ref{ssec:formal}. We then use a real-world application to illustrate the usage of our language extensions in Section~\ref{ssec:lan_examp}.
+
+%To support the use cases discussed above, we now present \textbf{Fluid}, a language extension to enable early execution using intermediate computed values. In this section, we first describe the specification of fluid, and then go over an example to demonstrate its application.
+
+\begin{figure}[ht]\vspace{-8pt}
+%\begin{comment}
+\scriptsize
+\begin{align*}
+\text{\em FluidStmt} &::\;  FluidDef \ |\ PragmaDef \ |\ TaskDef \\ 
+%&  \; \texttt{\{}VavleDef ^{+}\texttt{\}},\ QualityDef\texttt{)} \\
+%\text{\em TaskFunc} &::\; \{FuncType \; fn, \; Args... \; args\}\\
+\text{\em FluidDef} &::\; \texttt{\_\_Fluid\_\_} \ class\ \\%|\ \texttt{\_\_Fluid\_\_} \ struct\\
+\text{\em PragmaDef} &::\; StableDef\ |\ ValveDef\ |\ CountDef \\
+\text{\em StableDef} &::\; {\bf\#pragma}\ {\bf stable}\ \{\texttt{data\_type} \ x;\ \texttt{bool} \ stable\_check();\}\\
+%& \; {\bf\#pragma}\ stable\ \{\texttt{bool} \ stable\_check();\}\\
+\text{\em ValveDef} &::\; {\bf\#pragma}\ {\bf valve}\ \{\texttt{ValveCT} \ y; |\  \texttt{ValveST} \ y;\} \\
+%\text{\em ValveDef} &::\; {\bf\#pragma}\ {\bf valve}\ \{\texttt{Vtype} \ y;\} \\
+%\text{\em VType} &::\; \texttt{ValveGT}\ |\ \texttt{ValveEQ}\ |\ \texttt{ValveLT}\ |\  \texttt{ValveST}\\
+%\text{\em VType} &::\; \texttt{ValveCT}\ |\ \texttt{ValveST}\\
+\text{\em CountDef} &::\; {\bf \#pragma}\ {\bf count}\ \{\texttt{\_\_count\_\_}\  z\ |\ a = b\ |\ func()\ |\ TaskDef;\}\\
+%\text{\em PredDef} &::\; \texttt{bool} \;PredCond(\_\_fluid\_\_, Condition)\\
+\text{\em TaskDef} &::\; <<<task\_name,\ \{ValveSet\},\ \{Task^{*}\},\ vc^{0,1},\\
+&\; num\_thread^{0,1}>>>func()\\
+\text{\em ValveSet} &::\; \texttt{y(args ...), ValveSet}\ |\ \texttt{$\emptyset$}
+\end{align*}\vspace{-20pt}\caption{Syntax of the Fluid Language.}
+\label{figs:syntax}\vspace{-16pt}
+\end{figure}
+
+\subsection{Syntax and Semantics}
+\label{ssec:formal}
+The syntax of our Fluid language extensions is given in Figure~\ref{figs:syntax}. For a given statement in an application source code, the programmer can employ fluidity through explicitly using the fluid {\it keyword}, fluid {\it pragma}, and fluid {\it task}. 
+%Let us now discuss the details of each fluid component.
+
+\noindent{\bf Fluid keyword: }A class is declared as a fluid class by adding the \texttt{\_\_Fluid\_\_} keyword at the class declaration. It must satisfy the following properties: i) it consists of at least one \textit{producer} member function and at least one \textit{consumer} member function; ii) there is a \textit{fluid object} (i.e., data object) shared between the producer and the consumer. A fluid object can be acted upon by the consumer before the producer completes all its updates to it; iii) at some granularity, subsets of producer updates to the fluid object correspond to new well-formed {\it versions} of the fluid object which can be used by the consumer function; and iv) the consumer function can start its execution earlier using any version of the fluid object before the producer function finishes its execution. 
+
+%\noindent{\bf Fluid pragmas: }We use fluid pragmas to indicate when a consumer function can start its execution. In other words, a programmer can use with fluid pragmas to indicate the conditions under which to start a consumer function. 
+\noindent{\bf Fluid pragmas: } We use pragmas to annotate the variables and functions used in our fluid framework. The valve pragma includes the definition of a valve, which is a predefined class in our framework. It has a check function to check whether this valve is satisfied. We currently support two types of valves: a $count\ valve$ ({\tt valveCT}) and a $stability\ valve$ ({\tt valveST}), each differently satisfied.
+
+%\noindent{\bf Fluid pragmas: } We use pragma to annotate the variables and functions which are used in our fluid framework. The valve pragma includes the definition of valve functions, which control the start of the consumer. We currently support two types of valve functions: $count\ valve$ ({\tt valveCT}) and $stability\ valve$ ({\tt valveST}).
+
+The \textit{stable} pragma supports the stability valve. The programmer encloses a fluid object ($x$) and a stability check function ($check\_stable$) in the stable pragma. The data type of $x$ can be any kind of type in C++ ($int$, $char$, etc.), and the stability check function evaluates whether the corresponding fluid object is \textit{stable}. For example, an integer might be considered stable if its value has not changed during the last \textit{N} possible updates (where \textit{N} is a user defined "$threshold$"). Similarly, an array could be considered stable if a certain percentage of its elements have not changed their values during the last $threshold$ updates to the array. The check function of {\tt valveST} accepts a fluid object $x$ as the parameter and calls $check\_stable$ to evaluate whether $x$ is stable. It returns true if the value of that $x$ is stabilized. After the stability valve {\tt ValveST} is satisfied, the consumer function controlled by this valve can start using the stabilized value of $x$ even if the producer function can still potentially modify it in future.
+
+%The check function returns true if the fluid object is stable and false otherwise.
+
+%The fluid object (e.g., data variable) enclosed in stable pragma indicates that it has stability property. Generally speaking, the programmer will write a check\_stable function to check whether an object $vt$ got stable. For example, an integer can be consider as stabilized if the value of that integer has not changed during the last few updates (the number of updates during which the value should not be changed is referred to as "$threshold$"). Similarly, an array is said to be stable if a certain percentage of its elements have not changed the values during the last $threshold$ times of update operation. This check\_stable function will also be wrapped in the stable pragma, and is defined as a member function of a fluid class where the fluid object is defined. 
+
+Supporting the count valve involves two language extensions. First, we use the count pragma to enclose the corresponding definitions and operations of a counter, which is used to monitor the number of updates performed on the fluid object by a "$func()$" or a "$Task$". Specifically, a counter $z$ is declared as a predefined type {\tt \_\_count\_\_}. A "$func()$" or a "$Task$" wrapped in a count pragma indicates that each invocation of "$func()$" or "$Task$" is logged by the counter. Second, the check function of a count valve {\tt ValveCT} accepts two parameters: a counter $x$, which is modified by producer functions, and a threshold $t$. The check function compares the value of $x$ with a programmer-defined threshold $t$, and the count valve is satisfied when $x$ is greater than $t$.
+
+%\noindent{\bf Fluid task: } In the fluid execution paradigm, we expect the producer and consumer functions to execute concurrently in different threads. We achieve concurrency by 
+\noindent{\bf Fluid task: } In the fluid execution paradigm, we wrap the functions into fluid tasks. A task is a proxy of a member function in the fluid class and it consists of two parts: a {\it guard ($<<<\ >>>$)} and a {\it function (func())}. The guard has five fields enclosed by 
+$<<<task\_name, \{ValveSet\}, \{Task\}^{*}, vc^{0,1}, num\_thread^{0,1}>>>$ 
+The first field ($task\_name$) is the name of the task. The second field ($\{ValveSet\}$) is a set of valves with parameters. The semantics here are that the $func()$ cannot start its execution until all the valves are satisfied. The third field, ($\{Task\}^{*}$), optionally specifies other producer tasks that will be eligible for early termination when the consumer task starts (discussed in more detail in Section~\ref{sec:exe-mode}). The fourth field ($vc^{0,1}$) is a counter that is passed into $func()$ to monitor the number of updates performed by $func()$ on the fluid object. The last field ($num\_thread^{0,1}$) indicates that the runtime system spawns $num\_thread$ threads to execute $func()$. Note that it is possible that a task specifies no valve and/or no counters. Such a task is immediately ready.
+%For example, if $num\_thread$ is 4, it means that the runtime system (discussed later in Section~\ref{sec:fluid_runtime}) spawns 4 threads to execute $func()$. 
+%\sampson{Does num-thread=4 mean threadcount eq 4 or lt-eq 4?}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.49\textwidth]{figs/fluidclass.pdf}
+\vspace{-16pt}\caption{An example illustrating the syntax.}
+\label{figs:syntaxexample}\vspace{-12pt}
+\end{figure}
+
+To help understand the syntax, we show an example in Figure~\ref{figs:syntaxexample}a. In the fluid class, $data$ is a normal class member pointing to an array, $a$ is an integer type fluid object with stability property, and $b$ is a counter which counts the number of updates to the fluid object by the producer. $stable\_check()$ is the function to check whether $a$ is stable. We have four functions in this fluid class: {\it Alice}, {\it Bob}, {\it Charlie}, and {\it Diana}, where two are producer functions and two are consumer functions. We also have two valves defined in the class: the stability valve $v1$ and the count valve $v2$. 
+
+Figure~\ref{figs:syntaxexample}b and Figure~\ref{figs:syntaxexample}c show the producer and consumer tasks employing the predefined stability valve and count valve, respectively. In Figure~\ref{figs:syntaxexample}b, {\it Alice} takes $a$ as a reference input and modifies the value of $a$. The task name of {\it Alice} is ``AliceTask'' and the task guard has empty fields in valve and producer since {\it Alice} is the first producer function which starts execution without valve constraints. {\it Charlie} is the consumer function for $a$. It is guarded by a stability valve $v1(\&a,\ stThresh)$. $v1$ calls $stable\_check(\&a,\ stThresh)$ to check whether $a$ has not changed in the last $stThresh$ times {\it Alice} updates $a$, and starts the execution of {\it Charlie} when the $v1$ is satisfied. The task of {\it Charlie} also specifies {\it AliceTask} as the producer, which means that {\it Alice} will be terminated when {\it Charlie} starts its execution. In Figure~\ref{figs:syntaxexample}c, the task of {\it Bob} is associated with a counter $b$. {\it Bob} increases counter $b$ whenever it performs an update on $data$. The consumer function {\it Diana} is guarded by $v2 (b,\ ccThresh)$. $v2$ is satisfied if the value of $b$ is greater than $ccThresh$. The semantics here are that {\it Diana} starts its execution only when the fluid object (i.e., $data$) is updated at least $ccThresh$ times by {\it Bob}. Note that we do not specify ``BobTask'' in the guard of ``DianaTask'', meaning that {\it Bob} continues its execution even if {\it Diana} starts.
+
+%which means that {\it Charlie} starts its execution only when the value of $a$ has not changed in the last $stThresh$ times {\it Alice} updates $a$. 
+%Counter $b$ is used in {\it Bob} and is increased in every update of $data$ by {\it Bob}.  
+
+We show the corresponding data flow and control flow of the stability valve and count valve in Figure~\ref{figs:syntaxexample}d and Figure~\ref{figs:syntaxexample}e. In both scenarios, the control is passed to the guard in the consumer task. The consumer function only starts its execution after its guard observes the valve is satisfied. The data flow is slightly different between the stability valve and the count valve. In the stability valve, the value of the flow object ($int\ a$) is used in the consumer task's valve. However, the guard only uses the counter variable in the count valve. %\xulong{Huaipan, check if this paragraph is correct to your implementation.}
+
+%\todo{update d, e with proper intermediate versions of fluid object.}
+
+
+%Similar to normal class definition in object oriented programming (e.g., C++), a fluid class consists of data members (e.g., $fluid\_data1$, $fluid\_data2$, and $fluid\_data3$ in Figure~\ref{figs:fluidclass}a) and function members (e.g., $p1$, $p2$, $p3$, $c1$, and $c2$). The member functions are further divided into producer functions ($p1$, $p2$ and $p3$) and consumer functions ($c1$, and $c2$). In addition, a fluid class also contains different types of valve variables by using the $pragma$ supported in our fluid language. Other metadata are omitted in Figure~\ref{figs:fluidclass} as their definitions are identical to general class. The control flow and data flow of data members and function members in a fluid class are illustrated in Figure~\ref{figs:fluidclass}b. As we discussed earlier, the start of execution of each consumer function is controlled by a $guard$ in the task closure. Therefore, controls from producer  functions ($p1$ and $p2$) are not directly passed to consumer ($c1$). Instead, controls are given to guard function and are only passed to consumer function when the valves are satisfied. Note that, guard function does not intervene the data flow. The consumer function accesses data directly from producer functions. 
+
+%We give the detailed syntax and semantics of the fluid, valve and task concepts in Fig~\ref{figs:syntax} and Fig~\ref{figs:semantics}. We also provide essential APIs for the developers as listed in Fig~\ref{figs:semantics}. We want to emphasize that our extensions can mimic, if desired, the execution of the original program as well, by simply leaving valve set as empty in the tasks, and inserting a \texttt{Task::sync()} after each task definition. 
+  
+\subsection{A Fluid Code Example: k-means}
+\label{ssec:lan_examp}
+We demonstrate the fluidization of K-means~\cite{kmeanspaper}, a popular clustering algorithm, as an example of how an application source code is modified with our Fluid language extensions. This version of K-means operates on sets of pixels (an image) as an input, and outputs a set of K clusters, where each pixel is assigned to a cluster. Algorithm~\ref{alg:kmeans} shows the pseudocode of the original k-means algorithm. At a high level, it consists of two steps: {\it AssignCluster} and {\it Recenter}. The former assigns a cluster for every pixel in a given image, whereas the latter tunes the cluster centroids. More specifically, for a given input pixel, the distance between the pixel and every cluster centroid is calculated and the pixel is assigned to the cluster with the nearest centroid by calling \textit{procPixel} in AssignCluster. After all pixels are assigned a cluster, the Recenter function recalculates the cluster centroid based on the updated membership of pixels in that cluster. This AssignCluster and Recenter cycle continues until either a maximum number of iterations is reached or certain convergence criteria are met. 
+
+\begin{algorithm}
+\scriptsize
+%\textbf{Input: }An image with a set of pixels and a set of clusters}
+
+\begin{algorithmic}
+\STATE \textbf{Input: } An image with a set of pixels and a set of clusters
+\STATE \textbf{SegmentImage}(image, clusters, iter)
+%\FUNCTION{SegmentImage}{}
+\FOR { $i=1$ to $iter$ }
+	\STATE AssignCluster(image,clusters);
+    \STATE Recenter(image,clusters);
+\ENDFOR
+%\ENDFUNCTION
+
+\STATE \textbf{AssignCluster}(image, clusters)
+ 
+ \FOR {each pixel in image}
+  \STATE procPixel(pixel, clusters);
+ \ENDFOR
+ 
+\STATE \textbf{Recenter}(image, clusters)
+ 
+ \FOR {each $cluster_i$ in clusters}
+     \STATE $cluster_i$ $\gets$ average of pixels in $cluster_i$
+ \ENDFOR
+\end{algorithmic}
+%\begin{algorithmic}
+%\STATE n = 1
+%\FOR { $i=1$ \TO $n$ }
+%    \STATE $print(i)$
+%\ENDFOR
+%\end{algorithmic}
+\caption{K-means pseudo code}
+\label{alg:kmeans}
+\end{algorithm}
+
+\begin{figure}
+\vspace{-0pt}
+\centering
+\includegraphics[width=0.45\textwidth]{figs/kmeansfluid.pdf}
+\vspace{-12pt}\caption{K-means code with fluidity.}\label{figs:kmeansfluid}\vspace{-12pt}
+\end{figure}
+
+AssignCluster and Recenter can be considered as a ``producer'' and "consumer" function, respectively, and the cluster of each the pixel can be considered as the fluid object. In the original application, the Recenter function cannot start its execution until {\it all} of the input points are processed by AssignCluster, forcing AssignCluster and Recenter to execute in a sequential manner. There have been studies showing that one can break this sequential execution and make the AssignCluster and Recenter execute in parallel~\cite{orhan} while still producing useful output. This provides us with the motivation to explore the ``fluidity'' of the cluster value passed between the AssignCluster and Recenter functions.
+
+%As discussed in Section~\ref{ssec:formal}, our current implementation supports two types of valves, and either can be used to introduce fluidity to K-means. In a stability valve approach, the cluster membership of each input pixel would be monitored and we assume an image to be stabilized if a certain portion of the pixels (e.g., 80\%) in that image have not changed membership in the past few iterations (e.g., 4). The Recenter function would then start its execution either after the image becomes stable or the AssignCluster function has finished. To instead use a count valve to enable fluidity, Recenter would start when a certain fraction of input pixels have been assigned by AssignCluster. For example, a programmer can specify 80\% of input pixels by setting the counter $threshold$ to 80\% of the input image size.
+ 
+Figure~\ref{figs:kmeansfluid} shows fluidized versions of K-means with both stability and count valves. The code now contains two tasks (t1 and t2) in \textbf{KmeansMain} that represent the invocation of \textbf{AssignCluster} and \textbf{Recenter}, respectively. It also contains a stability valve $v1$ and a count valve $v2$ defined in the fluid class \textbf{KmeansImage}. The $image$ is wrapped in the stable pragma since it is considered as a ``fluid object'' with stability property. The function $Check\_stable$ is implemented by the programmer to check whether an image is stable. It returns $true$ if the image is stable, and $false$ otherwise. In the stable case, task \textit{t2} is associated with a stability valve \textit{v1}. The valve \text{V1} has two parameters: fluid object (\textit{image}) and \textit{threshold}, which indicates that \textit{image} is stable when certain portion of the pixel in \textit{image} have not changed their membership in the past \textit{threshold} iterations. $v1$ periodically invokes \textbf{check\_stable(}$image$, $threshold$\textbf{)} to check whether the $image$ has become stable and, if so, marks the consumer task as ready. To use a count valve for K-means, task \textit{t1} is associated with a counter variable \textbf{counter} to log the number of updates to the fluid object $image$. Each time a pixel is assigned a cluster, the \textbf{counter} is increased by one. Task \textit{t2} is associated with a count valve \textit{v2}. The valve \text{v2} has two parameters: \textit{counter} and \textit{image->size*0.8}. This means that \textbf{Recenter} starts its execution when 80\% of the pixels in $image$ have been processed. Recall that \textit{procPixel} in \textbf{AssignCluster} is used to assign a cluster to each pixel, and we wrap it in a count pragma, which means that the counter variable is increased by one after \textit{procPixel} updates each pixel. 
+
+
+
+%The fundamental reason behind is that most of the pixels do not change their cluster-ship after a few iterations. In other words, the cluster-ship of each pixel is stabilized after few iterations. %
+
+%However, it is non-trivial to determine when the recenter function should start its execution. On the one hand, starting it too early can lead to significant slow convergence rate and poor accuracy due to insufficient number of points having been processed. On the other hand, starting Recenter too late can lead to a zero-sum game in performance due to the incurred overheads. To this end
+%In our fluid framework, we provide the {\it valve} as a ``knob'' to allow the programmer to specify when the Recenter function can start. 
+
+
+%For example, 
+%with a prior-knowledge of inputs, a developer can set the value of valve of 80\%, to indicate that an image can be considered to be sufficiently updated by \textbf{AssignCluster} when 80\% of its pixels are updated, so that \textbf{Recenter} may start with the partially-updated version of the image, \textit{without} losing too much accuracy of computing the centroids. 
+
+%Therefore, this recenter function can start without waiting for the finish of Assigncluster
+
+%in the execution of AssignCluster, while updating all image pixels in the first few iterations is necessary, the later iterations that update image pixels can lead to wasted computation that has no effect to the \text{Recenter}. For example, with a prior-knowledge of inputs, a developer can set the value of valve of 80\%, to indicate that an image can be considered to be sufficiently updated by \textbf{AssignCluster} when 80\% of its pixels are updated, so that \textbf{Recenter} may start with the partially-updated version of the image, \textit{without} losing too much accuracy of computing the centroids. 
+
+%the \textit{image} variable keeps updating "cluster-ship", and Recenter can only start when \textit{image} is fully updated. Chances are that, with the incrementation of iterations, most image pixels more or less converge on one specific cluster, and only few pixels that are on the border of the clusters may change their "cluster-ship" [xxx]. Therefore, in the execution of \textbf{AssignCluster}, while updating all image pixels in the first few iterations is necessary, the later iterations that update image pixels can lead to wasted computation that has no effect to the \text{Recenter}. For example, with a prior-knowledge of inputs, a developer can set the value of valve of 80\%, to indicate that an image can be considered to be sufficiently updated by \textbf{AssignCluster} when 80\% of its pixels are updated, so that \textbf{Recenter} may start with the partially-updated version of the image, \textit{without} losing too much accuracy of computing the centroids. 
+
+
+%To understand the expressiveness of the Fluid language, let us focus on the example of k-means. Listing.~\ref{list:kmeansorigin} is the original k-means[xxx] kernel implementation, which is widely used in applications such as XXX, YYY, and ZZZ. In this example, k-means is used to segment an image into multiple clusters, based on pixels' RGB values (pixels with similar RGB values will be put into one cluster). The kernel function \textbf{SegmentImage} takes three parameters provided by the user: the image, the initialized clusters, and the number of iterations. In each iteration, the program first calls the \textbf{AssignCluster} to assign each pixel in the image to a cluster, by finding the cluster with least distance between the centroid of the cluster to this pixel (\textbf{assignCluster}). After processing \textit{all} pixels in the image, the program calls \textbf{Recenter} to update the centroids of \textit{all} clusters, due to the fact that the pixels may change their "cluster-ship" in first function call (\textbf{AssignCluster}).
+
+%During the execution of the \textbf{AssignCluster} function, the \textit{image} variable keeps updating "cluster-ship", and Recenter can only start when \textit{image} is fully updated. Chances are that, with the incrementation of iterations, most image pixels more or less converge on one specific cluster, and only few pixels that are on the border of the clusters may change their "cluster-ship" [xxx]. Therefore, in the execution of \textbf{AssignCluster}, while updating all image pixels in the first few iterations is necessary, the later iterations that update image pixels can lead to wasted computation that has no effect to the \text{Recenter}. For example, with a prior-knowledge of inputs, a developer can set the value of valve of 80\%, to indicate that an image can be considered to be sufficiently updated by \textbf{AssignCluster} when 80\% of its pixels are updated, so that \textbf{Recenter} may start with the partially-updated version of the image, \textit{without} losing too much accuracy of computing the centroids. 
+
+
+%At the beginning of each iteration of K-means, task \textit{t1} is first created and its function starts execution immediately  since it has no valve constrains. Task \textit{t2} is also created after {\bf t1} is created. Note however that, the function of {\bf t2} cannot start its execution since it is guarded by the guard of task {\bf t2}. Also note that, the guard threads of {\bf t2} keeps evalution
+
+%During the execution of \textit{t1}, \textit{counter} will count the number of invocations of \textbf{procPixel}. Meanwhile, \textit{t2} is created but its execution is conditioned on \textit{v1}. The execution keeps checking the value of \textit{v1} and starts \textbf{Recenter} as soon as it is satisfied. As a result, \text{Recenter} can potentially start earlier than the original execution pattern (where it had to wait the completion of \textbf{AssignCluster}). Note that, at each iteration, \textit{counter} is a new defined variable, the different \textit{counter}s in different iterations will not effect each other.

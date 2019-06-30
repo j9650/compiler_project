@@ -10,6 +10,7 @@ GuardState* GuardStateToCheck::statehandler = nullptr;
 GuardState* GuardStateToEndcheck::statehandler = nullptr;
 GuardState* GuardStateToPause::statehandler = nullptr;
 GuardState* GuardStateToTerminate::statehandler = nullptr;
+GuardState* GuardStateToWait::statehandler = nullptr;
 GuardState* GuardStateFactory::statehandler = nullptr;
 
 
@@ -20,6 +21,7 @@ std::string GuardStateToCheck::statename = "Check";
 std::string GuardStateToEndcheck::statename = "Endcheck";
 std::string GuardStateToPause::statename = "Pause";
 std::string GuardStateToTerminate::statename = "Terminate";
+std::string GuardStateToWait::statename = "Wait";
 std::string GuardStateToResume::statename = "Resume";
 
 //CPUTimer GuardStateToInit::cputimer;
@@ -65,6 +67,9 @@ public:
 		//if (nextGuard) SyncLogger::print(g->name, "send check to ", nextGuard->name);
 		
 		g->terminate = true;
+		for (Data *output_data : g->task->output) {
+			output_data->set_tag(1);
+		}
 		
 		GlobalCPUProfiler.endThread();
 	}
@@ -83,6 +88,9 @@ public:
 			g->worker->terminate();
 		}
 		g->task->finish = true;
+		for (Data *output_data : g->task->output) {
+			output_data->set_tag(1);
+		}
 		SyncLogger::print("TERMINATE+++++++", g->name, "Wall: ", (g->TaskTimerWT).stop(), "CPU:", (g->TaskTimerCT).stop());
 		//Guard * nextGuard = g->gs->nextGuardToStart(g);
 
@@ -155,6 +163,7 @@ public:
 			//////std::cout << "Check not Pass" << std::endl;
 		}
 	}
+
 	static void ActionAtCheckingAndStart(Guard* g) {
 		GlobalCPUProfiler.addThread();
 		while (1) {
@@ -173,6 +182,64 @@ public:
 				return;
 			}
 			//////std::cout << "Check not Pass" << std::endl;
+		}
+	}
+
+	static void ActionAtWait(Guard* g) {
+		GlobalCPUProfiler.addThread();
+		bool requested = g->is_leaf;
+		while (1) {
+			// check all children has complete.
+			bool check = true;
+			for (Data *output_data : g->task->output) {
+				std::string statename_ = output_data->consumer()->gstate->get_statename();
+				if ((statename_ != "Complete") && (statename_ != "Terminate")) {
+					check = false;
+					break;
+				}
+			}
+			// all children completed
+			if (check) {
+				g->putSignal(g, "Completed");
+				GlobalCPUProfiler.endThread();
+				return;
+			}
+
+			// If (this->children->request_version > this->version)
+			//     this->request_version = parent_version + 1
+			// requested can be considered as state D
+			if (!requested) {  // if this node has not requested from its parent.
+				// check all of its children, whether any of then request data.
+				for (Data *output_data : g->task->output) {
+					if (output_data->consumer()->request_version[output_data] >
+					   output_data->version()) {
+					   	// some child requested data, request data from all parents.
+						for (Data *input_data : g->task->input) {
+							g->request_version[input_data] = g->parent_version[input_data] + 1;
+						}
+						requested = true;
+						break;
+					}
+				}
+			}
+
+			// If (this->parent_version + 1<= this->parent->version)
+			//     GOTO R
+			check = true;
+			for (Data *input_data : g->task->input) {
+				std::string statename_ = input_data->producer()->gstate->get_statename();
+				if ((statename_ != "Complete") && (statename_ != "Terminate") &&
+				   (g->parent_version[input_data] + 1 > input_data->version())) {
+					check = false;
+					break;
+				}
+			}
+
+			if (check) {
+				g->putSignal(g, "Start");
+				GlobalCPUProfiler.endThread();
+				return;
+			}
 		}
 	}
 
@@ -199,26 +266,71 @@ public:
 		}
 	}
 
-	static void ActionAtEndchecking(Guard* g) { //123//switch to ActionAtCheckingAndTerminate
+	static void ActionAtEndchecking(Guard* g) {
 		GlobalCPUProfiler.addThread();
 
 		bool check = false;
-		// first check end valves (maybe empty)
-		for (auto v : g->endvs) {
-			if (v->check() == false)
-				check = true;
-		}
-		// TODO: check input data and children
 
-		if (check == false) {
-			//pass the valves!!
-			//123//Guard::putSignal(g, "Start");
+		if (g->is_leaf) {
+			// first check end valves (maybe empty)
+			for (auto v : g->endvs) {
+				if (v->check() == false)
+					check = true;
+			}
+			// TODO: check input data and children
+
+			if (check == false) {
+				//pass the valves!!
+				//123//Guard::putSignal(g, "Start");
+				g->putSignal(g, "Completed");
+				GlobalCPUProfiler.endThread();
+				return;
+			}
+		}
+
+		// check if all input data used completed version
+		check = true;
+		for (Data *input_data : g->task->input) {
+			// get the state of its parent.
+			std::string statename_ = input_data->producer()->gstate->get_statename();
+			// if the parent is not finished or didn't used the complete version, check fail.
+			if (((statename_ != "Complete") && (statename_ != "Terminate")) ||
+				(input_data->version() > g->parent_version[input_data])) {
+				check = false;
+				break;
+			}
+		}
+		// all input data used completed version
+		if (check) {
 			g->putSignal(g, "Completed");
 			GlobalCPUProfiler.endThread();
 			return;
 		}
-		if (check == true) {
-			g->putSignal(g, "Start");
+
+		// check if all children completeds
+		check = true;
+		if (g->is_leaf) {
+			check = false;
+		} else {
+			for (Data *output_data : g->task->output) {
+				// get the state of its children.
+				std::string statename_ = output_data->consumer()->gstate->get_statename();
+				// if the parent is not finished or didn't used the complete version, check fail.
+				if ((statename_ != "Complete") && (statename_ != "Terminate")) {
+					check = false;
+					break;
+				}
+			}
+		}
+		// all children completed version
+		if (check) {
+			g->putSignal(g, "Completed");
+			GlobalCPUProfiler.endThread();
+			return;
+		}
+
+		if (check != true) {
+			g->putSignal(g, "Wait");
 			GlobalCPUProfiler.endThread();
 			return;
 		}
@@ -231,6 +343,13 @@ public:
 		GlobalCPUProfiler.addThread();
 		SyncLogger::prefix = "Guard-" + std::to_string(g->guardId) + " ";
 		std::cout << g->name << "static void ActionAtStart" << std::endl;
+
+		// end valve, get the parent version for each input.
+		// At begin of R: this->parent_version = this -> parent ->version
+		for (Data *input_data : g->task->input) {
+			g->parent_version[input_data] = input_data->version();
+		}
+
 		g->runTask(); 
 		//SyncLogger::print("TASKFINISHED", g->name, "Wall: ", (g->TaskTimerWT).stop(), "CPU:", (g->TaskTimerCT).stop());
 
@@ -399,6 +518,57 @@ void GuardStateToStart::handle(Guard* g, Signal sig) {
 }
 
 void GuardStateToEndcheck::handle(Guard* g, Signal sig) {
+	std::cout << g->name << " GuardStateToCheck::handle: " << sig.msg() << std::endl;
+	(g->StateTimerWT).start();
+	(g->StateTimerCT).start();
+	if (sig.msg().compare("Check") == 0 && g->execmodel == 0) {
+		assert(0);
+		g->gstate = GuardStateToCheck::Instance();
+
+		GuardStateActions::ActionAtCheckingNoStarting(g);
+	}
+	else if (sig.msg().compare("Check") == 0 && g->execmodel == 1) {
+		assert(0);
+		g->gstate = GuardStateToCheck::Instance();
+
+		GuardStateActions::ActionAtCheckingAndTerminate(g);
+	}
+	else if (sig.msg().compare("Start") == 0) {
+		g->gstate = GuardStateToStart::Instance();
+		GuardStateActions::ActionAtStart(g);
+
+	}
+	else if (sig.msg().compare("Wait") == 0) {
+		g->gstate = GuardStateToWait::Instance();
+		GuardStateActions::ActionAtWait(g);
+
+	}
+	else if (sig.msg().compare("Completed") == 0) {
+		(g->StateTimerWT).start();
+		(g->StateTimerCT).start();
+		g->gstate = GuardStateToComplete::Instance();
+		GuardStateActions::ActionAtCompleted(g);
+		GlobalProfiler.addWallTimeStamp(statename, (g->StateTimerWT).stop());
+		GlobalProfiler.addCPUTimeStamp(statename, (g->StateTimerCT).stop());
+	}
+	else if (sig.msg().compare("Terminate") == 0 && g->execmodel == 2) {
+		g->gstate = GuardStateToInit::Instance();
+		GuardStateActions::ActionAtSpecTerminated(g);
+	}
+	else if (sig.msg().compare("Terminate") == 0) {
+		assert(0);
+		g->gstate = GuardStateToTerminate::Instance();
+		GuardStateActions::ActionAtTerminated(g);
+	}
+	else {
+		assert(0); // not valid!
+	}
+	GlobalProfiler.addWallTimeStamp(statename, (g->StateTimerWT).stop());
+	GlobalProfiler.addCPUTimeStamp(statename, (g->StateTimerCT).stop());
+	return;
+}
+
+void GuardStateToWait::handle(Guard* g, Signal sig) {
 	std::cout << g->name << " GuardStateToCheck::handle: " << sig.msg() << std::endl;
 	(g->StateTimerWT).start();
 	(g->StateTimerCT).start();
